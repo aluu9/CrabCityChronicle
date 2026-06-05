@@ -617,7 +617,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
 <!-- ══ MASTHEAD ══ -->
 <header class="masthead">
   <div class="masthead-top">
-    <div class="masthead-brand">
+    <div class="masthead-brand" onclick="show('home')" style="cursor:pointer;">
       <img src="data:image/png;base64,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" class="masthead-logo" alt="Crab City Chronicle logo" style="width:42px;height:42px;object-fit:contain;opacity:0.92;flex-shrink:0;">
       <div>
         <div class="masthead-title">Crab City Chronicle</div>
@@ -635,7 +635,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
     </div>
   </div>
   <nav class="nav-strip">
-    <div class="nav-item active" data-page="home" onclick="show('home')">Front Page</div>
     <div class="nav-item" data-page="players" onclick="show('players')">Dossiers</div>
     <div class="nav-item" data-page="clans" onclick="show('clans')">Clan Records</div>
     <div class="nav-item" data-page="wars" onclick="show('wars')">War Reports</div>
@@ -763,7 +762,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ PLAYERS / DOSSIERS ══ -->
   <div id="page-players" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-back" onclick="show('home')">← Front Page</div>
       <div class="page-title">Player Dossiers</div>
       <div class="page-sub">Community-submitted records on soldiers operating in Crab City</div>
     </div>
@@ -780,7 +778,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ CLAN HISTORY ══ -->
   <div id="page-clans" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-back" onclick="show('home')">← Front Page</div>
       <div class="page-title">Clan Records</div>
       <div class="page-sub">Historical timeline of events, milestones, and power shifts</div>
     </div>
@@ -799,7 +796,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ WARS ══ -->
   <div id="page-wars" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-back" onclick="show('home')">← Front Page</div>
       <div class="page-title">War Reports</div>
       <div class="page-sub">Recorded engagements between clans — results, kill counts, and summaries</div>
     </div>
@@ -812,7 +808,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ LEADERBOARD ══ -->
   <div id="page-leaderboard" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-back" onclick="show('home')">← Front Page</div>
       <div class="page-title">The Board</div>
       <div class="page-sub">Crab City's ranked soldiers — filter by family and stat</div>
     </div>
@@ -833,6 +828,9 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
       <button class="filter-btn" onclick="lbSort('wins',this)">Wins</button>
       <button class="filter-btn" onclick="lbSort('kd',this)">K/D ratio</button>
       <button class="filter-btn" onclick="lbSort('playtime',this)">Playtime</button>
+      <button class="filter-btn" onclick="lbSort('wins_as_boss',this)">Boss Wins</button>
+      <button class="filter-btn" onclick="lbSort('money',this)">Money</button>
+      <button class="filter-btn" onclick="lbSort('cards',this)">Cards</button>
     </div>
 
     <div id="lb-list" class="fade-in"></div>
@@ -846,7 +844,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ NEWS ══ -->
   <div id="page-news" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-back" onclick="show('home')">← Front Page</div>
       <div class="page-title">Intelligence</div>
       <div class="page-sub">Rumours, announcements, and dispatches from the streets</div>
     </div>
@@ -863,7 +860,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ PATCHES ══ -->
   <div id="page-patches" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-back" onclick="show('home')">← Front Page</div>
       <div class="page-title">Dev Dispatches</div>
       <div class="page-sub">Every patch note archived — from the first hotfix to the latest drop</div>
     </div>
@@ -873,7 +869,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ SUBMIT ══ -->
   <div id="page-submit" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-back" onclick="show('home')">← Front Page</div>
       <div class="page-title">Submit to the Archive</div>
       <div class="page-sub">Sign in with Discord to submit player stats, faction records, or video evidence</div>
     </div>
@@ -894,17 +889,42 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
       <!-- PLAYER STATS FORM -->
       <div id="form-player">
         <div class="form-card">
-          <div class="form-title">Player Stat Entry</div>
-          <div class="form-sub">Submit your in-game stats for the archive. All fields marked with * are required.</div>
-          <div class="form-group">
-            <label class="form-label">Player name <span>*</span></label>
-            <input class="form-input" id="p-name" type="text" placeholder="Your in-game username" required>
+          <div class="form-title">Player Stats — Video Evidence Required</div>
+          <div class="form-sub">Record a video of your in-game stats screen. Your username and all stats must be visible with no cuts. Use the Discord bot to submit — upload your video in Discord and use the <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text)">/submit-player</span> command.</div>
+          <div style="margin: 1.25rem 0; padding: 1.25rem; background: var(--paper3); border: 1px solid var(--rule2); border-radius: 2px;">
+            <div style="font-family:var(--font-head);font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;">What your video must show:</div>
+            <div style="font-family:var(--font-body);font-size:0.85rem;color:var(--muted);line-height:1.9;">
+              &#9656; Your in-game username clearly visible<br>
+              &#9656; The full stats screen open<br>
+              &#9656; All stats readable — Time Played, Kills, Deaths, Wins, etc.<br>
+              &#9656; No cuts or edits — minimum 5 seconds on the stats screen<br>
+              &#9656; Max 50MB — MP4, WebM, or MOV
+            </div>
           </div>
+          <div style="font-family:var(--font-head);font-weight:700;font-size:0.9rem;margin-bottom:0.5rem;">How to submit:</div>
+          <div style="font-family:var(--font-body);font-size:0.85rem;color:var(--muted);line-height:1.9;">
+            1. Record your screen showing the stats page<br>
+            2. Upload the video to any channel in our Discord<br>
+            3. Right-click the video → Copy Link<br>
+            4. Run <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text)">/submit-player</span> and paste the link in the <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text)">video_url</span> field
+          </div>
+        </div>
+      </div>
+
+      <!-- FACTION STATS FORM -->
+      <div id="form-faction" style="display:none">
+        <div class="form-card">
+          <div class="form-title">Faction Entry</div>
+          <div class="form-sub">Register your faction in the archive. All fields marked with * are required. Image proof of the faction page is required.</div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Faction <span>*</span></label>
-              <select class="form-input" id="p-faction" required>
-                <option value="">Select faction...</option>
+              <label class="form-label">Faction name <span>*</span></label>
+              <input class="form-input" id="f-name" type="text" placeholder="Your faction name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Team / Family <span>*</span></label>
+              <select class="form-input" id="f-team" required>
+                <option value="">Select family...</option>
                 <option>Romanos</option>
                 <option>Gonzalezes</option>
                 <option>Ivanovs</option>
@@ -912,89 +932,28 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
                 <option>Police</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Clan</label>
-              <input class="form-input" id="p-clan" type="text" placeholder="Clan name">
-            </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Rank</label>
-              <input class="form-input" id="p-rank" type="text" placeholder="Your rank">
+              <label class="form-label">Number of members <span>*</span></label>
+              <input class="form-input" id="f-members" type="number" min="1" placeholder="0" required>
             </div>
             <div class="form-group">
-              <label class="form-label">Playtime (hours)</label>
-              <input class="form-input" id="p-playtime" type="number" min="0" placeholder="0">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Kills <span>*</span></label>
-              <input class="form-input" id="p-kills" type="number" min="0" placeholder="0" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Deaths <span>*</span></label>
-              <input class="form-input" id="p-deaths" type="number" min="0" placeholder="0" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Wins</label>
-              <input class="form-input" id="p-wins" type="number" min="0" placeholder="0">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Losses</label>
-              <input class="form-input" id="p-losses" type="number" min="0" placeholder="0">
+              <label class="form-label">Date started <span>*</span></label>
+              <input class="form-input" id="f-date" type="date" required>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Notes</label>
-            <input class="form-input" id="p-notes" type="text" placeholder="Any extra context">
-          </div>
-          <button class="form-submit" onclick="submitPlayer()">Submit for review</button>
-          <div class="form-msg" id="p-msg"></div>
-        </div>
-      </div>
-
-      <!-- FACTION STATS FORM -->
-      <div id="form-faction" style="display:none">
-        <div class="form-card">
-          <div class="form-title">Faction Stat Entry</div>
-          <div class="form-sub">Submit a snapshot of a faction's current stats for the archive.</div>
-          <div class="form-group">
-            <label class="form-label">Faction <span>*</span></label>
-            <select class="form-input" id="f-faction" required>
-              <option value="">Select faction...</option>
-              <option>Romanos</option>
-              <option>Gonzalezes</option>
-              <option>Ivanovs</option>
-              <option>Yamamotos</option>
-              <option>Police</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Total members</label>
-              <input class="form-input" id="f-members" type="number" min="0" placeholder="0">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Territories held</label>
-              <input class="form-input" id="f-territory" type="number" min="0" placeholder="0">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Wins</label>
-              <input class="form-input" id="f-wins" type="number" min="0" placeholder="0">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Losses</label>
-              <input class="form-input" id="f-losses" type="number" min="0" placeholder="0">
-            </div>
+            <label class="form-label">Owner(s) <span>*</span></label>
+            <input class="form-input" id="f-owners" type="text" placeholder="Username, Username2" required>
           </div>
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <input class="form-input" id="f-desc" type="text" placeholder="Any notes about this faction">
+            <label class="form-label">Permanent Discord invite link <span>*</span></label>
+            <input class="form-input" id="f-invite" type="text" placeholder="https://discord.gg/..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Image proof URL <span>*</span></label>
+            <input class="form-input" id="f-image" type="text" placeholder="Screenshot of faction page — upload to Discord and copy link" required>
           </div>
           <button class="form-submit" onclick="submitFaction()">Submit for review</button>
           <div class="form-msg" id="f-msg"></div>
@@ -1101,7 +1060,7 @@ async function loadHomePreviews() {
   // Latest patch
   const patchEl = document.getElementById('home-patch')
   try {
-    const { data: patches } = await sb.from('dev_patches').select('*').eq('status','approved').order('patch_date',{ascending:false}).limit(1)
+    const { data: patches } = await sb.from('dev_patches').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(1)
     if (patches?.length) {
       const p = patches[0]
       patchEl.innerHTML = `
@@ -1194,6 +1153,11 @@ async function fetchPlayers(name) {
         ${p.kills != null && p.deaths != null ? `<div class="chip">K/D <b>${kd(p.kills,p.deaths).toFixed(2)}</b></div>` : ''}
         ${p.wins != null ? `<div class="chip">Wins <b>${p.wins}</b></div>` : ''}
         ${p.losses != null ? `<div class="chip">Losses <b>${p.losses}</b></div>` : ''}
+        ${p.wins_as_boss != null ? `<div class="chip">Wins as Boss <b>${p.wins_as_boss}</b></div>` : ''}
+        ${p.times_boss != null ? `<div class="chip">Times Boss <b>${p.times_boss}</b></div>` : ''}
+        ${p.cards_earned != null ? `<div class="chip">Cards <b>${p.cards_earned}</b></div>` : ''}
+        ${p.money_earned != null ? `<div class="chip">Money <b>$${p.money_earned.toLocaleString()}</b></div>` : ''}
+        ${p.bodies_buried != null ? `<div class="chip">Bodies Buried <b>${p.bodies_buried}</b></div>` : ''}
         ${p.playtime_hours != null ? `<div class="chip">Time in city <b>${p.playtime_hours}h</b></div>` : ''}
       </div>
       ${p.notes ? `<div style="margin-top:0.6rem; font-size:0.82rem; color:var(--muted); font-style:italic">${esc(p.notes)}</div>` : ''}
@@ -1316,18 +1280,24 @@ function renderPlayerLb() {
     wins: (a,b) => (b.wins||0)-(a.wins||0),
     kd: (a,b) => kd(b.kills,b.deaths)-kd(a.kills,a.deaths),
     playtime: (a,b) => (b.playtime_hours||0)-(a.playtime_hours||0),
+    wins_as_boss: (a,b) => (b.wins_as_boss||0)-(a.wins_as_boss||0),
+    money: (a,b) => (b.money_earned||0)-(a.money_earned||0),
+    cards: (a,b) => (b.cards_earned||0)-(a.cards_earned||0),
   }
   if (currentLbSort) data.sort(sorters[currentLbSort])
 
   if (!data.length) { el.innerHTML = '<div class="state-msg">No records for this family.</div>'; return }
 
-  const labels = {kills:'Kills',deaths:'Deaths',wins:'Wins',kd:'K/D',playtime:'Hrs'}
+  const labels = {kills:'Kills',deaths:'Deaths',wins:'Wins',kd:'K/D',playtime:'Hrs',wins_as_boss:'Boss Wins',money:'Money',cards:'Cards'}
   const getValue = p => {
     if (currentLbSort==='kills') return (p.kills||0).toLocaleString()
     if (currentLbSort==='deaths') return (p.deaths||0).toLocaleString()
     if (currentLbSort==='wins') return (p.wins||0).toLocaleString()
     if (currentLbSort==='kd') return kd(p.kills,p.deaths).toFixed(2)
     if (currentLbSort==='playtime') return (p.playtime_hours||0)+'h'
+    if (currentLbSort==='wins_as_boss') return (p.wins_as_boss||0).toLocaleString()
+    if (currentLbSort==='money') return '$'+(p.money_earned||0).toLocaleString()
+    if (currentLbSort==='cards') return (p.cards_earned||0).toLocaleString()
     return null
   }
   const rankCls = i => i===0?'gold':i===1?'silver':i===2?'bronze':''
@@ -1343,6 +1313,7 @@ function renderPlayerLb() {
       ${showSortCol ? `<th class="r">${labels[currentLbSort]}</th>` : ''}
       <th class="r">K/D</th>
       <th class="r">Wins</th>
+      <th class="r">Boss Wins</th>
     </tr></thead>
     <tbody>${data.slice(0,50).map((p,i) => `
       <tr class="lb-tr">
@@ -1353,6 +1324,7 @@ function renderPlayerLb() {
         ${showSortCol ? `<td class="lb-td r">${getValue(p)}</td>` : ''}
         <td class="lb-td r">${p.kills!=null&&p.deaths!=null?kd(p.kills,p.deaths).toFixed(2):'—'}</td>
         <td class="lb-td r">${p.wins!=null?p.wins:'—'}</td>
+        <td class="lb-td r">${p.wins_as_boss!=null?p.wins_as_boss:'—'}</td>
       </tr>
     `).join('')}</tbody>
   </table></div>`
@@ -1421,7 +1393,7 @@ function renderNews(data) {
 async function loadPatches() {
   const el = document.getElementById('patch-list')
   let data
-  try { ({ data } = await sb.from('dev_patches').select('*').eq('status','approved').order('patch_date',{ascending:false}).limit(30)) }
+  try { ({ data } = await sb.from('dev_patches').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(30)) }
   catch(e) { el.innerHTML = '<div class="state-msg">Could not load dispatches. Check back later.</div>'; return }
   if (!data?.length) { el.innerHTML = '<div class="state-msg">No dispatches filed yet.</div>'; return }
   el.innerHTML = `<div class="card-list">${data.map(p => `
@@ -1431,7 +1403,7 @@ async function loadPatches() {
         <span class="card-title" style="margin:0">${esc(p.title)}</span>
         <span class="card-meta" style="margin-left:auto">${fmtDate(p.patch_date)}</span>
       </div>
-      <div class="patch-body">${esc(p.content)}</div>
+      <div class="patch-body">${esc(p.content).replace(/\n/g, '<br>')}</div>
     </div>
   `).join('')}</div>`
 }
@@ -1581,6 +1553,11 @@ async function submitPlayer() {
         deaths: parseInt(deaths),
         wins: document.getElementById('p-wins').value ? parseInt(document.getElementById('p-wins').value) : null,
         losses: document.getElementById('p-losses').value ? parseInt(document.getElementById('p-losses').value) : null,
+        wins_as_boss: document.getElementById('p-wins-boss').value ? parseInt(document.getElementById('p-wins-boss').value) : null,
+        times_boss: document.getElementById('p-times-boss').value ? parseInt(document.getElementById('p-times-boss').value) : null,
+        cards_earned: document.getElementById('p-cards').value ? parseInt(document.getElementById('p-cards').value) : null,
+        money_earned: document.getElementById('p-money').value ? parseFloat(document.getElementById('p-money').value) : null,
+        bodies_buried: document.getElementById('p-bodies').value ? parseInt(document.getElementById('p-bodies').value) : null,
         playtime_hours: document.getElementById('p-playtime').value ? parseFloat(document.getElementById('p-playtime').value) : null,
         notes: document.getElementById('p-notes').value || null,
       })
@@ -1596,8 +1573,17 @@ async function submitPlayer() {
 // ── SUBMIT FACTION ──
 async function submitFaction() {
   if (!currentUser) return
-  const faction = document.getElementById('f-faction').value
-  if (!faction) return showMsg('f-msg', 'error', 'Please select a faction.')
+  const name = document.getElementById('f-name').value.trim()
+  const team = document.getElementById('f-team').value
+  const members = document.getElementById('f-members').value
+  const date = document.getElementById('f-date').value
+  const owners = document.getElementById('f-owners').value.trim()
+  const invite = document.getElementById('f-invite').value.trim()
+  const image = document.getElementById('f-image').value.trim()
+
+  if (!name || !team || !members || !date || !owners || !invite || !image) {
+    return showMsg('f-msg', 'error', 'Please fill in all required fields.')
+  }
 
   const btn = document.querySelector('#form-faction .form-submit')
   btn.disabled = true; btn.textContent = 'Submitting...'
@@ -1610,16 +1596,17 @@ async function submitFaction() {
         type: 'faction_stats',
         discord_id: currentUser.discord_id,
         discord_username: currentUser.username,
-        faction_name: faction,
-        total_members: document.getElementById('f-members').value ? parseInt(document.getElementById('f-members').value) : null,
-        territory_count: document.getElementById('f-territory').value ? parseInt(document.getElementById('f-territory').value) : null,
-        wins: document.getElementById('f-wins').value ? parseInt(document.getElementById('f-wins').value) : null,
-        losses: document.getElementById('f-losses').value ? parseInt(document.getElementById('f-losses').value) : null,
-        description: document.getElementById('f-desc').value || null,
+        faction_name: name,
+        team,
+        total_members: parseInt(members),
+        date_started: date,
+        owners,
+        invite_link: invite,
+        image_proof: image,
       })
     })
     const data = await res.json()
-    if (data.success) showMsg('f-msg', 'success', `Submitted successfully. Entry ID: ${data.id}. A mod will review it shortly.`)
+    if (data.success) showMsg('f-msg', 'success', `Faction submitted. Entry ID: ${data.id}. A mod will review it shortly.`)
     else showMsg('f-msg', 'error', data.error || 'Submission failed.')
   } catch (e) { showMsg('f-msg', 'error', 'Network error. Please try again.') }
 
