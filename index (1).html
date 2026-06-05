@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crab City Chronicle — Mafia Clash Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Special+Elite&family=DM+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink: #0d0b08;
+  --paper: #f5f0e8;
+  --paper2: #ede8dc;
+  --paper3: #e4dece;
+  --aged: #c8bfa8;
+  --aged2: #a09080;
+  --text: #1a1510;
+  --muted: #6b5f50;
+  --muted2: #8c7d6c;
+  --rule: rgba(26,21,16,0.15);
+  --rule2: rgba(26,21,16,0.25);
+
+  /* faction colors */
+  --romano: #8B1A1A;
+  --romano2: #c0392b;
+  --gonzalez: #1a5c1a;
+  --gonzalez2: #27ae60;
+  --ivanov: #1a2c5c;
+  --ivanov2: #2980b9;
+  --yamamoto: #4a1a4a;
+  --yamamoto2: #8e44ad;
+  --police: #1a3a5c;
+  --police2: #2471a3;
+
+  --font-head: 'Playfair Display', serif;
+  --font-body: 'Crimson Pro', serif;
+  --font-type: 'Special Elite', cursive;
+  --font-mono: 'DM Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+.submit-page { max-width: 680px; }
+.form-card { background: var(--paper2); border: 1px solid var(--rule2); border-radius: 2px; padding: 1.75rem; margin-bottom: 1.5rem; }
+.form-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+.form-sub { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); font-style: italic; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--rule); }
+.form-group { margin-bottom: 1rem; }
+.form-label { display: block; font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 5px; }
+.form-label span { color: var(--romano); margin-left: 2px; }
+.form-input { width: 100%; background: var(--paper); border: 1px solid var(--rule2); border-radius: 2px; padding: 7px 10px; color: var(--text); font-family: var(--font-body); font-size: 0.9rem; outline: none; transition: border-color 0.15s; }
+.form-input:focus { border-color: var(--ink); }
+.form-input::placeholder { color: var(--aged2); font-style: italic; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.form-submit { font-family: var(--font-type); font-size: 0.85rem; letter-spacing: 0.08em; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; padding: 10px 24px; cursor: pointer; transition: opacity 0.15s; width: 100%; margin-top: 0.5rem; }
+.form-submit:hover { opacity: 0.85; }
+.form-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.form-msg { font-family: var(--font-mono); font-size: 0.72rem; padding: 8px 12px; border-radius: 2px; margin-top: 0.75rem; display: none; }
+.form-msg.success { background: rgba(0,180,100,0.1); border: 1px solid rgba(0,180,100,0.3); color: #007a40; }
+.form-msg.error { background: rgba(220,50,50,0.1); border: 1px solid rgba(220,50,50,0.3); color: #9a1a1a; }
+.tab-btns { display: flex; gap: 0; border: 1px solid var(--rule2); border-radius: 2px; overflow: hidden; margin-bottom: 1.5rem; }
+.tab-btn { flex: 1; padding: 8px; font-family: var(--font-mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; background: transparent; border: none; border-right: 1px solid var(--rule2); color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.tab-btn:last-child { border-right: none; }
+.tab-btn.active { background: var(--ink); color: var(--paper); }
+.login-gate { text-align: center; padding: 3rem 1.5rem; border: 1px solid var(--rule2); border-radius: 2px; }
+.login-gate-title { font-family: var(--font-head); font-size: 1.3rem; font-weight: 700; font-style: italic; margin-bottom: 0.5rem; }
+.login-gate-sub { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); font-style: italic; margin-bottom: 1.5rem; }
+.login-gate-btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-type); font-size: 0.85rem; letter-spacing: 0.08em; background: var(--ink); color: var(--paper); border: none; border-radius: 2px; padding: 10px 24px; cursor: pointer; text-decoration: none; }
+.file-drop { border: 2px dashed var(--rule2); border-radius: 2px; padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.15s; }
+.file-drop:hover, .file-drop.drag { border-color: var(--ink); }
+.file-drop-text { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); font-style: italic; }
+.file-drop-name { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text); margin-top: 6px; }
+
+.masthead-logo { width: 56px; height: 56px; object-fit: contain; margin-bottom: 0.75rem; opacity: 0.92; }
+.masthead-logo-sm { width: 28px; height: 28px; object-fit: contain; opacity: 0.85; flex-shrink: 0; }
+.hero-logo { width: 100px; height: 100px; object-fit: contain; margin: 0 auto 1.5rem; display: block; opacity: 0.9; }
+
+
+body {
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── PAPER TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(26,21,16,0.03) 27px, rgba(26,21,16,0.03) 28px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  background: var(--ink);
+  color: var(--paper);
+  position: sticky; top: 0; z-index: 200;
+  border-bottom: 3px double rgba(245,240,232,0.2);
+}
+.masthead-top {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.75rem 2rem;
+  border-bottom: 1px solid rgba(245,240,232,0.1);
+}
+.masthead-brand {
+  display: flex; align-items: center; gap: 0.85rem;
+  flex: 1;
+}
+.masthead-title {
+  font-family: var(--font-head);
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  color: var(--paper);
+  line-height: 1;
+}
+.masthead-sub {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--aged2);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.masthead-date {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--aged2);
+  white-space: nowrap;
+}
+.masthead-rule { display: none; }
+
+.nav-strip {
+  display: flex; gap: 0;
+  padding: 0 1rem;
+  flex-wrap: wrap;
+}
+.nav-item {
+  padding: 0.2rem 0.9rem;
+  font-family: var(--font-type);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--aged2);
+  cursor: pointer;
+  border-right: 1px solid rgba(245,240,232,0.15);
+  transition: color 0.15s;
+}
+.nav-item:last-child { border-right: none; }
+.nav-item:hover, .nav-item.active { color: var(--paper); }
+
+/* ── LAYOUT ── */
+main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: relative; z-index: 1; }
+
+/* ── SECTION RULE ── */
+.section-rule {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin: 2.5rem 0 1.5rem;
+}
+.section-rule-title {
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.section-rule::before, .section-rule::after {
+  content: ''; flex: 1; height: 1px; background: var(--rule2);
+}
+
+/* ── HOME FRONT PAGE ── */
+.front-hero {
+  border-bottom: 3px double var(--rule2);
+  padding: 2.5rem 0 2rem;
+  text-align: center;
+}
+.front-kicker {
+  font-family: var(--font-type);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+.front-headline {
+  font-family: var(--font-head);
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 1rem;
+}
+.front-deck {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 560px;
+  margin: 0 auto 2rem;
+  font-style: italic;
+  line-height: 1.6;
+}
+.front-stats {
+  display: flex; justify-content: center; gap: 0;
+  border: 1px solid var(--rule2);
+  border-radius: 2px;
+  display: inline-flex;
+  overflow: hidden;
+}
+.front-stat {
+  padding: 0.75rem 1.5rem;
+  border-right: 1px solid var(--rule2);
+  text-align: center;
+}
+.front-stat:last-child { border-right: none; }
+.front-stat-val {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: block;
+}
+.front-stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  display: block;
+  margin-top: 1px;
+}
+
+/* ── WIDGET GRID ── */
+.widget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  border: 1px solid var(--rule2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+}
+.widget {
+  padding: 1.5rem;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+  background: var(--paper);
+}
+.widget:hover { background: var(--paper2); }
+.widget-num {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--rule2);
+  line-height: 1;
+  margin-bottom: 0.6rem;
+}
+.widget-name {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+.widget-desc {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.widget-count {
+  position: absolute; top: 1.25rem; right: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted2);
+  background: var(--paper3);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 2px 6px;
+  text-transform: uppercase;
+}
+.widget-arrow {
+  position: absolute; bottom: 1.25rem; right: 1.25rem;
+  font-family: var(--font-head);
+  font-size: 1.1rem;
+  color: var(--muted2);
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+  transform: translateX(-4px);
+}
+.widget:hover .widget-arrow { opacity: 1; transform: translateX(0); }
+
+/* ── HOW-TO SECTION ── */
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--rule2);
+  margin-bottom: 2.5rem;
+  overflow: hidden;
+}
+@media (max-width: 640px) { .how-grid { grid-template-columns: 1fr; } }
+.how-block {
+  padding: 1.75rem;
+  border-right: 1px solid var(--rule);
+}
+.how-block:last-child { border-right: none; }
+.how-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+.how-body {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.how-body strong { color: var(--text); font-weight: 600; }
+.cmd-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink);
+  background: var(--paper3);
+  border: 1px solid var(--rule2);
+  border-radius: 2px;
+  padding: 1px 6px;
+}
+.score-row {
+  display: flex; align-items: baseline; gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.88rem;
+}
+.score-row:last-child { border-bottom: none; }
+.score-label { color: var(--muted); flex: 1; font-style: italic; }
+.score-val { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; color: var(--text); }
+
+/* ── FACTION PILLS ── */
+.faction-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding: 2px 7px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+.fp-romanos { color: var(--romano); border-color: var(--romano); background: rgba(139,26,26,0.06); }
+.fp-gonzalezes { color: var(--gonzalez); border-color: var(--gonzalez); background: rgba(26,92,26,0.06); }
+.fp-ivanovs { color: var(--ivanov); border-color: var(--ivanov); background: rgba(26,44,92,0.06); }
+.fp-yamamotos { color: var(--yamamoto); border-color: var(--yamamoto); background: rgba(74,26,74,0.06); }
+.fp-police { color: var(--police); border-color: var(--police); background: rgba(26,58,92,0.06); }
+.fp-default { color: var(--muted); border-color: var(--rule2); background: transparent; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 2rem 0 1.5rem;
+  border-bottom: 3px double var(--rule2);
+  margin-bottom: 1.75rem;
+}
+.page-back {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: 0.6rem;
+  display: inline-block;
+  transition: color 0.15s;
+}
+.page-back:hover { color: var(--text); }
+.page-title {
+  font-family: var(--font-head);
+  font-size: 2.2rem;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1.1;
+}
+.page-sub {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.3rem;
+}
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+.filter-btn {
+  padding: 4px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--rule2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-btn:hover { background: var(--paper2); color: var(--text); }
+.filter-btn.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.filter-sep { width: 1px; height: 18px; background: var(--rule2); margin: 0 3px; }
+.search-input {
+  flex: 1; min-width: 180px;
+  background: transparent;
+  border: 1px solid var(--rule2);
+  border-radius: 2px;
+  padding: 5px 10px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--ink); }
+.search-input::placeholder { color: var(--aged2); font-style: italic; }
+
+/* ── LEADERBOARD TABLE ── */
+.lb-wrap { border: 1px solid var(--rule2); border-radius: 2px; overflow: hidden; margin-bottom: 2rem; }
+.lb-table { width: 100%; border-collapse: collapse; }
+.lb-table thead { background: var(--ink); color: var(--paper); }
+.lb-table th {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+.lb-table th.r { text-align: right; }
+.lb-table th:first-child { padding-left: 1.25rem; }
+.lb-tr { border-bottom: 1px solid var(--rule); transition: background 0.1s; }
+.lb-tr:last-child { border-bottom: none; }
+.lb-tr:hover { background: var(--paper2); }
+.lb-tr:nth-child(even) { background: var(--paper2); }
+.lb-tr:nth-child(even):hover { background: var(--paper3); }
+.lb-td { padding: 0.8rem 1rem; font-size: 0.88rem; color: var(--muted); vertical-align: middle; }
+.lb-td:first-child { padding-left: 1.25rem; }
+.lb-td.r { text-align: right; font-family: var(--font-mono); font-size: 0.78rem; }
+.lb-rank {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--aged2);
+  min-width: 32px;
+}
+.lb-rank.gold { color: #8B6914; }
+.lb-rank.silver { color: #666; }
+.lb-rank.bronze { color: #7a4b2a; }
+.lb-name { font-weight: 600; color: var(--text); font-size: 0.9rem; font-family: var(--font-body); }
+.lb-sub { font-size: 0.72rem; color: var(--muted2); font-style: italic; }
+
+/* ── GENERIC CARD LIST ── */
+.card-list { border: 1px solid var(--rule2); border-radius: 2px; overflow: hidden; }
+.card-item {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+  transition: background 0.1s;
+}
+.card-item:last-child { border-bottom: none; }
+.card-item:hover { background: var(--paper2); }
+.card-item:nth-child(even) { background: var(--paper2); }
+.card-item:nth-child(even):hover { background: var(--paper3); }
+.card-title {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.card-meta {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 0.75rem; }
+.chip {
+  background: var(--paper3);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+.chip b { color: var(--text); font-weight: 500; }
+
+/* ── WAR CARD ── */
+.war-matchup { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.war-clan { font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; flex: 1; min-width: 80px; }
+.war-clan.lost { color: var(--muted2); text-decoration: line-through; }
+.war-score-mid { font-family: var(--font-head); font-size: 0.8rem; font-style: italic; color: var(--muted); text-align: center; min-width: 50px; }
+.war-winner-badge {
+  font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase;
+  letter-spacing: 0.08em; padding: 2px 8px; border: 1px solid var(--rule2);
+  border-radius: 2px; color: var(--text); background: var(--paper3);
+}
+
+/* ── TIMELINE ── */
+.timeline { position: relative; padding-left: 1.5rem; margin-top: 0.5rem; }
+.timeline::before { content: ''; position: absolute; left: 5px; top: 5px; bottom: 0; width: 1px; background: var(--rule2); }
+.tl-item { position: relative; margin-bottom: 1.5rem; }
+.tl-dot { position: absolute; left: -1.3rem; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--ink); border: 2px solid var(--paper); }
+.tl-date { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px; }
+.tl-title { font-family: var(--font-head); font-weight: 700; font-size: 0.92rem; }
+.tl-type {
+  display: inline-block; margin-left: 6px;
+  font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--muted); border: 1px solid var(--rule); padding: 1px 5px; border-radius: 2px;
+}
+.tl-desc { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); margin-top: 4px; line-height: 1.55; font-style: italic; }
+
+/* ── NEWS ── */
+.news-cat { font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted2); margin-bottom: 0.35rem; }
+.news-headline { font-family: var(--font-head); font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; }
+
+.agency-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono); font-size: 0.6rem;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  padding: 2px 8px; border-radius: 2px; border: 1px solid;
+  margin-bottom: 0.5rem;
+}
+.agency-ccc { color: var(--romano); border-color: var(--romano); background: rgba(139,26,26,0.06); }
+.agency-dnh { color: var(--ivanov); border-color: var(--ivanov); background: rgba(26,44,92,0.06); }
+.news-image { width: 100%; max-height: 340px; object-fit: cover; border-radius: 2px; margin-bottom: 0.85rem; display: block; }
+.news-body { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); line-height: 1.7; font-style: italic; }
+
+/* ── PATCH ── */
+.patch-ver { font-family: var(--font-mono); font-size: 0.7rem; background: var(--ink); color: var(--paper); padding: 2px 8px; border-radius: 2px; margin-right: 8px; }
+.patch-body { font-family: var(--font-body); font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-top: 0.75rem; white-space: pre-wrap; }
+
+/* ── CLAN LB ── */
+.clan-row {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  transition: background 0.1s;
+}
+.clan-row:last-child { border-bottom: none; }
+.clan-row:hover { background: var(--paper2); }
+.clan-row:nth-child(even) { background: var(--paper2); }
+.clan-rank { font-family: var(--font-head); font-size: 0.95rem; font-weight: 700; font-style: italic; color: var(--aged2); min-width: 32px; }
+.clan-rank.gold { color: #8B6914; }
+.clan-rank.silver { color: #666; }
+.clan-rank.bronze { color: #7a4b2a; }
+.clan-name { font-family: var(--font-head); font-weight: 700; flex: 1; }
+.clan-stats { display: flex; gap: 1.5rem; font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted2); }
+.clan-stats b { color: var(--text); }
+
+/* ── STATE MESSAGES ── */
+.state-msg {
+  text-align: center; color: var(--muted2);
+  padding: 3rem 0;
+  font-family: var(--font-type);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--paper2); }
+::-webkit-scrollbar-thumb { background: var(--aged); border-radius: 2px; }
+
+/* ── FADE IN ── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.25s ease forwards; }
+
+/* ── FACTION COLORS on rows ── */
+.faction-strip { display: flex; gap: 0; margin-bottom: 1.5rem; border: 1px solid var(--rule2); border-radius: 2px; overflow: hidden; }
+.faction-block { flex: 1; padding: 0.6rem 0.5rem; text-align: center; font-family: var(--font-mono); font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; transition: opacity 0.15s; }
+.faction-block:hover { opacity: 0.75; }
+.faction-block.active { opacity: 1; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.3); }
+.fb-romanos { background: var(--romano); color: #ffeaea; }
+.fb-gonzalezes { background: var(--gonzalez); color: #e8fce8; }
+.fb-ivanovs { background: var(--ivanov); color: #e8eeff; }
+.fb-yamamotos { background: var(--yamamoto); color: #f0e8ff; }
+.fb-police { background: var(--police); color: #e8f0ff; }
+.fb-all { background: var(--ink); color: var(--paper); }
+
+@media (max-width: 580px) { #home-latest-grid { grid-template-columns: 1fr !important; } }
+</style>
+</head>
+<body>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="masthead-top">
+    <div class="masthead-brand">
+      <img src="data:image/png;base64,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" class="masthead-logo" alt="Crab City Chronicle logo" style="width:42px;height:42px;object-fit:contain;opacity:0.92;flex-shrink:0;">
+      <div>
+        <div class="masthead-title">Crab City Chronicle</div>
+        <div class="masthead-sub">The Mafia Clash Community Record</div>
+      </div>
+    </div>
+    <div class="masthead-date" id="today-date">Est. Crab City</div>
+    <div id="auth-area" style="flex-shrink:0;">
+      <a href="/api/auth/discord" id="login-btn" style="display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--paper);background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:2px;padding:5px 12px;text-decoration:none;transition:background 0.15s;">Sign in with Discord</a>
+      <div id="user-info" style="display:none;align-items:center;gap:8px;">
+        <img id="user-avatar" src="" alt="" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);">
+        <span id="user-name" style="font-family:var(--font-mono);font-size:0.65rem;color:var(--aged2);letter-spacing:0.08em;"></span>
+        <a onclick="logout()" style="font-family:var(--font-mono);font-size:0.6rem;color:var(--aged2);cursor:pointer;text-transform:uppercase;letter-spacing:0.08em;margin-left:4px;">Sign out</a>
+      </div>
+    </div>
+  </div>
+  <nav class="nav-strip">
+    <div class="nav-item active" data-page="home" onclick="show('home')">Front Page</div>
+    <div class="nav-item" data-page="players" onclick="show('players')">Dossiers</div>
+    <div class="nav-item" data-page="clans" onclick="show('clans')">Clan Records</div>
+    <div class="nav-item" data-page="wars" onclick="show('wars')">War Reports</div>
+    <div class="nav-item" data-page="leaderboard" onclick="show('leaderboard')">The Board</div>
+    <div class="nav-item" data-page="news" onclick="show('news')">Intelligence</div>
+    <div class="nav-item" data-page="patches" onclick="show('patches')">Dispatch</div>
+    <div class="nav-item" data-page="submit" onclick="show('submit')">Submit</div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ══ HOME ══ -->
+  <div id="page-home" class="fade-in">
+    <div class="front-hero">
+      <img src="data:image/png;base64,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" class="hero-logo" alt="Crab City Chronicle">
+      <div class="front-kicker">Crab City, Est. Community Archive</div>
+      <h1 class="front-headline">Four Families.<br>One City. No Rules.</h1>
+      <p class="front-deck">The definitive community record of Mafia Clash — player dossiers, clan wars, and the unwritten history of Crab City's underworld.</p>
+      <div class="front-stats">
+        <div class="front-stat"><span class="front-stat-val" id="stat-players">—</span><span class="front-stat-label">Dossiers</span></div>
+        <div class="front-stat"><span class="front-stat-val" id="stat-wars">—</span><span class="front-stat-label">Wars</span></div>
+        <div class="front-stat"><span class="front-stat-val" id="stat-clans">—</span><span class="front-stat-label">Clan Events</span></div>
+        <div class="front-stat"><span class="front-stat-val" id="stat-patches">—</span><span class="front-stat-label">Dispatches</span></div>
+      </div>
+    </div>
+
+    <div class="section-rule"><div class="section-rule-title">Latest intelligence</div></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--rule2); border-radius: 2px; overflow: hidden; margin-bottom: 2rem;">
+      <div style="padding: 1.5rem; border-right: 1px solid var(--rule);">
+        <div style="font-family:var(--font-mono); font-size:0.6rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--muted2); margin-bottom:0.75rem;">Latest dispatch</div>
+        <div id="home-patch"><div class="state-msg" style="padding:1rem 0; font-size:0.8rem;">No dispatches filed yet.</div></div>
+        <div style="margin-top:1rem;">
+          <span onclick="show('patches')" style="font-family:var(--font-mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); cursor:pointer; border-bottom: 1px solid var(--rule2);">All dispatches →</span>
+        </div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <div style="font-family:var(--font-mono); font-size:0.6rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--muted2); margin-bottom:0.75rem;">Latest news</div>
+        <div id="home-news"><div class="state-msg" style="padding:1rem 0; font-size:0.8rem;">Nothing on the wire yet.</div></div>
+        <div style="margin-top:1rem;">
+          <span onclick="show('news')" style="font-family:var(--font-mono); font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); cursor:pointer; border-bottom: 1px solid var(--rule2);">All intelligence →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-rule"><div class="section-rule-title">Browse the archive</div></div>
+    <div class="widget-grid">
+      <div class="widget" onclick="show('players')">
+        <div class="widget-num">I</div>
+        <div class="widget-name">Player Dossiers</div>
+        <div class="widget-desc">Kills, deaths, rank, and faction allegiance for every recorded soldier in Crab City.</div>
+        <div class="widget-count" id="wc-players">...</div>
+        <div class="widget-arrow">→</div>
+      </div>
+      <div class="widget" onclick="show('clans')">
+        <div class="widget-num">II</div>
+        <div class="widget-name">Clan History</div>
+        <div class="widget-desc">Timeline of every crew — founding, wars, leadership coups, mergers, and dissolutions.</div>
+        <div class="widget-count" id="wc-clans">...</div>
+        <div class="widget-arrow">→</div>
+      </div>
+      <div class="widget" onclick="show('wars')">
+        <div class="widget-num">III</div>
+        <div class="widget-name">War Reports</div>
+        <div class="widget-desc">Head-to-head results between clans. Who hit, who fell, and who walked away.</div>
+        <div class="widget-count" id="wc-wars">...</div>
+        <div class="widget-arrow">→</div>
+      </div>
+      <div class="widget" onclick="show('leaderboard')">
+        <div class="widget-num">IV</div>
+        <div class="widget-name">The Board</div>
+        <div class="widget-desc">Top players ranked by kill count, K/D, wins, and more. Filter by family. The city's pecking order.</div>
+        <div class="widget-count" id="wc-lb">...</div>
+        <div class="widget-arrow">→</div>
+      </div>
+      <div class="widget" onclick="show('news')">
+        <div class="widget-num">V</div>
+        <div class="widget-name">Intelligence</div>
+        <div class="widget-desc">Rumours, announcements, and community dispatches straight from the streets of Crab City.</div>
+        <div class="widget-count" id="wc-news">...</div>
+        <div class="widget-arrow">→</div>
+      </div>
+      <div class="widget" onclick="show('patches')">
+        <div class="widget-num">VI</div>
+        <div class="widget-name">Dev Dispatches</div>
+        <div class="widget-desc">Every patch note archived — buffs, nerfs, fixes, and new additions to the game.</div>
+        <div class="widget-count" id="wc-patches">...</div>
+        <div class="widget-arrow">→</div>
+      </div>
+    </div>
+
+    <div class="section-rule"><div class="section-rule-title">How it works</div></div>
+    <div class="how-grid">
+      <div class="how-block">
+        <div class="how-title">Filing a Report</div>
+        <div class="how-body">
+          All entries are submitted through the <strong>Mafia Clash Discord</strong> using slash commands. Join the server and use any of the following:
+          <br><br>
+          <span class="cmd-pill">/submit-player</span> — your kills, deaths, rank, family, clan<br>
+          <span class="cmd-pill">/submit-war</span> — war result between two clans<br>
+          <span class="cmd-pill">/submit-clan-history</span> — a clan event or milestone<br>
+          <span class="cmd-pill">/submit-news</span> — a news post or rumour<br>
+          <span class="cmd-pill">/submit-patch</span> — a dev update<br>
+          <br>
+          Every submission enters a <strong>mod review queue</strong>. Nothing goes public until a moderator approves it. You will receive a Discord notification either way.
+        </div>
+      </div>
+      <div class="how-block">
+        <div class="how-title">How War Score is Calculated</div>
+        <div class="how-body">
+          War score determines clan ranking on the board. It is calculated from each submitted war result:
+          <br><br>
+          <div class="score-row"><span class="score-label">Win</span><span class="score-val">+3 pts</span></div>
+          <div class="score-row"><span class="score-label">Loss</span><span class="score-val">+0 pts</span></div>
+          <div class="score-row"><span class="score-label">Kill differential (per 10 kills ahead)</span><span class="score-val">+1 pt</span></div>
+          <div class="score-row"><span class="score-label">Clean sweep (opponent 0 kills)</span><span class="score-val">+2 pts bonus</span></div>
+          <br>
+          Scores accumulate from all submitted war entries. Use <span class="cmd-pill">/submit-leaderboard</span> to update your clan's running totals. Mods verify numbers before they count toward the ranking.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ PLAYERS / DOSSIERS ══ -->
+  <div id="page-players" style="display:none">
+    <div class="page-header fade-in">
+      <div class="page-back" onclick="show('home')">← Front Page</div>
+      <div class="page-title">Player Dossiers</div>
+      <div class="page-sub">Community-submitted records on soldiers operating in Crab City</div>
+    </div>
+    <div class="filter-bar fade-in">
+      <input class="search-input" id="player-search" type="text" placeholder="Search by name..." oninput="searchPlayers(this.value)">
+      <div class="filter-sep"></div>
+      <button class="filter-btn active" onclick="playerSort('kills',this)">Kills</button>
+      <button class="filter-btn" onclick="playerSort('wins',this)">Wins</button>
+      <button class="filter-btn" onclick="playerSort('kd',this)">K/D</button>
+      <button class="filter-btn" onclick="playerSort('playtime',this)">Playtime</button>
+    </div>
+    <div id="player-list" class="fade-in"><div class="state-msg">Search a name to pull a dossier.</div></div>
+  </div>
+  <!-- ══ CLAN HISTORY ══ -->
+  <div id="page-clans" style="display:none">
+    <div class="page-header fade-in">
+      <div class="page-back" onclick="show('home')">← Front Page</div>
+      <div class="page-title">Clan Records</div>
+      <div class="page-sub">Historical timeline of events, milestones, and power shifts</div>
+    </div>
+    <div class="filter-bar fade-in">
+      <input class="search-input" id="clan-search" type="text" placeholder="Search clan name..." oninput="searchClans(this.value)">
+      <div class="filter-sep"></div>
+      <button class="filter-btn active" onclick="filterClanType('all',this)">All</button>
+      <button class="filter-btn" onclick="filterClanType('founded',this)">Founded</button>
+      <button class="filter-btn" onclick="filterClanType('war',this)">War</button>
+      <button class="filter-btn" onclick="filterClanType('leadership_change',this)">Leadership</button>
+      <button class="filter-btn" onclick="filterClanType('disbanded',this)">Disbanded</button>
+    </div>
+    <div id="clan-list" class="fade-in"><div class="state-msg">Search a clan name to pull records.</div></div>
+  </div>
+
+  <!-- ══ WARS ══ -->
+  <div id="page-wars" style="display:none">
+    <div class="page-header fade-in">
+      <div class="page-back" onclick="show('home')">← Front Page</div>
+      <div class="page-title">War Reports</div>
+      <div class="page-sub">Recorded engagements between clans — results, kill counts, and summaries</div>
+    </div>
+    <div class="filter-bar fade-in">
+      <input class="search-input" id="war-search" type="text" placeholder="Search clan name..." oninput="filterWars(this.value)">
+    </div>
+    <div id="war-list" class="fade-in"></div>
+  </div>
+
+  <!-- ══ LEADERBOARD ══ -->
+  <div id="page-leaderboard" style="display:none">
+    <div class="page-header fade-in">
+      <div class="page-back" onclick="show('home')">← Front Page</div>
+      <div class="page-title">The Board</div>
+      <div class="page-sub">Crab City's ranked soldiers — filter by family and stat</div>
+    </div>
+
+    <div class="faction-strip fade-in" id="lb-faction-strip">
+      <div class="faction-block fb-all active" onclick="lbFaction('all',this)">All Families</div>
+      <div class="faction-block fb-romanos" onclick="lbFaction('Romanos',this)">Romanos</div>
+      <div class="faction-block fb-gonzalezes" onclick="lbFaction('Gonzalezes',this)">Gonzalezes</div>
+      <div class="faction-block fb-ivanovs" onclick="lbFaction('Ivanovs',this)">Ivanovs</div>
+      <div class="faction-block fb-yamamotos" onclick="lbFaction('Yamamotos',this)">Yamamotos</div>
+      <div class="faction-block fb-police" onclick="lbFaction('Police',this)">Police</div>
+    </div>
+
+    <div class="filter-bar fade-in" style="border-top:none; padding-top:0;">
+      <span style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted2); text-transform:uppercase; letter-spacing:0.08em;">Rank by:</span>
+      <button class="filter-btn active" onclick="lbSort('kills',this)">Kills</button>
+      <button class="filter-btn" onclick="lbSort('deaths',this)">Deaths</button>
+      <button class="filter-btn" onclick="lbSort('wins',this)">Wins</button>
+      <button class="filter-btn" onclick="lbSort('kd',this)">K/D ratio</button>
+      <button class="filter-btn" onclick="lbSort('playtime',this)">Playtime</button>
+    </div>
+
+    <div id="lb-list" class="fade-in"></div>
+
+    <div style="margin-top: 2.5rem;">
+      <div class="section-rule"><div class="section-rule-title">Clan standings</div></div>
+      <div id="clan-lb-list" class="lb-wrap"></div>
+    </div>
+  </div>
+
+  <!-- ══ NEWS ══ -->
+  <div id="page-news" style="display:none">
+    <div class="page-header fade-in">
+      <div class="page-back" onclick="show('home')">← Front Page</div>
+      <div class="page-title">Intelligence</div>
+      <div class="page-sub">Rumours, announcements, and dispatches from the streets</div>
+    </div>
+    <div class="filter-bar fade-in">
+      <button class="filter-btn active" onclick="filterNews('all',this)">All</button>
+      <button class="filter-btn" onclick="filterNews('general',this)">General</button>
+      <button class="filter-btn" onclick="filterNews('event',this)">Events</button>
+      <button class="filter-btn" onclick="filterNews('announcement',this)">Announcements</button>
+      <button class="filter-btn" onclick="filterNews('rumour',this)">Rumours</button>
+    </div>
+    <div id="news-list" class="fade-in"></div>
+  </div>
+
+  <!-- ══ PATCHES ══ -->
+  <div id="page-patches" style="display:none">
+    <div class="page-header fade-in">
+      <div class="page-back" onclick="show('home')">← Front Page</div>
+      <div class="page-title">Dev Dispatches</div>
+      <div class="page-sub">Every patch note archived — from the first hotfix to the latest drop</div>
+    </div>
+    <div id="patch-list" class="fade-in"></div>
+  </div>
+
+  <!-- ══ SUBMIT ══ -->
+  <div id="page-submit" style="display:none">
+    <div class="page-header fade-in">
+      <div class="page-back" onclick="show('home')">← Front Page</div>
+      <div class="page-title">Submit to the Archive</div>
+      <div class="page-sub">Sign in with Discord to submit player stats, faction records, or video evidence</div>
+    </div>
+
+    <div id="submit-gate" class="login-gate fade-in">
+      <div class="login-gate-title">Sign in to submit</div>
+      <div class="login-gate-sub">You need to sign in with your Discord account before you can submit entries to the archive.</div>
+      <a href="/api/auth/discord" class="login-gate-btn">Sign in with Discord</a>
+    </div>
+
+    <div id="submit-forms" style="display:none" class="submit-page fade-in">
+      <div class="tab-btns">
+        <button class="tab-btn active" onclick="switchForm('player')">Player Stats</button>
+        <button class="tab-btn" onclick="switchForm('faction')">Faction Stats</button>
+        <button class="tab-btn" onclick="switchForm('video')">Video Evidence</button>
+      </div>
+
+      <!-- PLAYER STATS FORM -->
+      <div id="form-player">
+        <div class="form-card">
+          <div class="form-title">Player Stat Entry</div>
+          <div class="form-sub">Submit your in-game stats for the archive. All fields marked with * are required.</div>
+          <div class="form-group">
+            <label class="form-label">Player name <span>*</span></label>
+            <input class="form-input" id="p-name" type="text" placeholder="Your in-game username" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Faction <span>*</span></label>
+              <select class="form-input" id="p-faction" required>
+                <option value="">Select faction...</option>
+                <option>Romanos</option>
+                <option>Gonzalezes</option>
+                <option>Ivanovs</option>
+                <option>Yamamotos</option>
+                <option>Police</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clan</label>
+              <input class="form-input" id="p-clan" type="text" placeholder="Clan name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Rank</label>
+              <input class="form-input" id="p-rank" type="text" placeholder="Your rank">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Playtime (hours)</label>
+              <input class="form-input" id="p-playtime" type="number" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Kills <span>*</span></label>
+              <input class="form-input" id="p-kills" type="number" min="0" placeholder="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deaths <span>*</span></label>
+              <input class="form-input" id="p-deaths" type="number" min="0" placeholder="0" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Wins</label>
+              <input class="form-input" id="p-wins" type="number" min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Losses</label>
+              <input class="form-input" id="p-losses" type="number" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <input class="form-input" id="p-notes" type="text" placeholder="Any extra context">
+          </div>
+          <button class="form-submit" onclick="submitPlayer()">Submit for review</button>
+          <div class="form-msg" id="p-msg"></div>
+        </div>
+      </div>
+
+      <!-- FACTION STATS FORM -->
+      <div id="form-faction" style="display:none">
+        <div class="form-card">
+          <div class="form-title">Faction Stat Entry</div>
+          <div class="form-sub">Submit a snapshot of a faction's current stats for the archive.</div>
+          <div class="form-group">
+            <label class="form-label">Faction <span>*</span></label>
+            <select class="form-input" id="f-faction" required>
+              <option value="">Select faction...</option>
+              <option>Romanos</option>
+              <option>Gonzalezes</option>
+              <option>Ivanovs</option>
+              <option>Yamamotos</option>
+              <option>Police</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Total members</label>
+              <input class="form-input" id="f-members" type="number" min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Territories held</label>
+              <input class="form-input" id="f-territory" type="number" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Wins</label>
+              <input class="form-input" id="f-wins" type="number" min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Losses</label>
+              <input class="form-input" id="f-losses" type="number" min="0" placeholder="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <input class="form-input" id="f-desc" type="text" placeholder="Any notes about this faction">
+          </div>
+          <button class="form-submit" onclick="submitFaction()">Submit for review</button>
+          <div class="form-msg" id="f-msg"></div>
+        </div>
+      </div>
+
+      <!-- VIDEO FORM -->
+      <div id="form-video" style="display:none">
+        <div class="form-card">
+          <div class="form-title">Video Evidence</div>
+          <div class="form-sub">Upload a screen recording of your in-game stats. The video must show your username and stat screen clearly with no cuts. Max 50MB — MP4, WebM, or MOV.</div>
+          <div class="form-group">
+            <label class="form-label">Player name <span>*</span></label>
+            <input class="form-input" id="v-name" type="text" placeholder="Your in-game username" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Faction <span>*</span></label>
+              <select class="form-input" id="v-faction" required>
+                <option value="">Select faction...</option>
+                <option>Romanos</option>
+                <option>Gonzalezes</option>
+                <option>Ivanovs</option>
+                <option>Yamamotos</option>
+                <option>Police</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Clan</label>
+              <input class="form-input" id="v-clan" type="text" placeholder="Clan name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Kills <span>*</span></label>
+              <input class="form-input" id="v-kills" type="number" min="0" placeholder="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Deaths <span>*</span></label>
+              <input class="form-input" id="v-deaths" type="number" min="0" placeholder="0" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Wins</label>
+              <input class="form-input" id="v-wins" type="number" min="0" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rank</label>
+              <input class="form-input" id="v-rank" type="text" placeholder="Your rank">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:0.5rem;">
+            <label class="form-label">Video file <span>*</span></label>
+            <div class="file-drop" id="file-drop" onclick="document.getElementById('v-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+              <div class="file-drop-text">Click to select or drag and drop your video here</div>
+              <div class="file-drop-name" id="file-name">No file selected</div>
+            </div>
+            <input type="file" id="v-file" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo" style="display:none" onchange="handleFileSelect(this)">
+          </div>
+          <button class="form-submit" id="v-submit" onclick="submitVideo()">Upload and submit</button>
+          <div class="form-msg" id="v-msg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co'
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const PAGES = ['home','players','clans','wars','leaderboard','news','patches']
+let currentPage = 'home'
+let searchTimer = null
+let allWarData = [], allLbData = [], allNewsData = []
+let currentLbSort = 'kills', currentLbFaction = 'all'
+let currentClanType = 'all', currentNewsFilter = 'all'
+let currentPlayerSort = 'kills'
+
+// Set today's date in masthead
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) + ' · Crab City Archive'
+
+function show(page) {
+  document.getElementById('page-' + currentPage).style.display = 'none'
+  document.getElementById('page-' + page).style.display = 'block'
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page))
+  currentPage = page
+  window.scrollTo(0, 0)
+  if (page !== 'home') loadPage(page)
+}
+
+function loadPage(p) {
+  if (p === 'wars') loadWars()
+  if (p === 'leaderboard') loadLeaderboard()
+  if (p === 'news') loadNews()
+  if (p === 'patches') loadPatches()
+}
+
+
+async function loadHomePreviews() {
+  // Latest patch
+  const patchEl = document.getElementById('home-patch')
+  try {
+    const { data: patches } = await sb.from('dev_patches').select('*').eq('status','approved').order('patch_date',{ascending:false}).limit(1)
+    if (patches?.length) {
+      const p = patches[0]
+      patchEl.innerHTML = `
+        <div>
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; flex-wrap:wrap;">
+            <span class="patch-ver">v${esc(p.version)}</span>
+            <span style="font-family:var(--font-head); font-weight:700; font-size:0.92rem;">${esc(p.title)}</span>
+          </div>
+          <div style="font-family:var(--font-body); font-size:0.85rem; color:var(--muted); font-style:italic; line-height:1.65; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;">${esc(p.content)}</div>
+          <div style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted2); text-transform:uppercase; letter-spacing:0.07em; margin-top:0.6rem;">${fmtDate(p.patch_date)}</div>
+        </div>`
+    }
+  } catch(e) {}
+
+  // Latest news
+  const newsEl = document.getElementById('home-news')
+  try {
+    const { data: news } = await sb.from('news').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(1)
+    if (news?.length) {
+      const n = news[0]
+      newsEl.innerHTML = `
+        <div>
+          <div style="font-family:var(--font-mono); font-size:0.6rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted2); margin-bottom:0.3rem;">${esc(n.category)}</div>
+          <div style="font-family:var(--font-head); font-weight:700; font-size:1rem; margin-bottom:0.4rem;">${esc(n.title)}</div>
+          <div style="font-family:var(--font-body); font-size:0.85rem; color:var(--muted); font-style:italic; line-height:1.65; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;">${esc(n.content)}</div>
+          <div style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted2); text-transform:uppercase; letter-spacing:0.07em; margin-top:0.6rem;">${fmtDate(n.created_at)}</div>
+        </div>`
+    }
+  } catch(e) {}
+}
+async function loadHomeCounts() {
+  const map = [
+    ['player_stats','stat-players','wc-players'],
+    ['clan_wars','stat-wars','wc-wars'],
+    ['clan_history','stat-clans','wc-clans'],
+    ['dev_patches','stat-patches','wc-patches'],
+    ['clan_leaderboard',null,'wc-lb'],
+    ['news',null,'wc-news'],
+  ]
+  for (const [table, heroId, widgetId] of map) {
+    const { count } = await sb.from(table).select('*',{count:'exact',head:true}).eq('status','approved')
+    const n = count || 0
+    if (heroId) document.getElementById(heroId).textContent = n.toLocaleString()
+    document.getElementById(widgetId).textContent = n + (n === 1 ? ' record' : ' records')
+  }
+}
+
+// ── PLAYERS ──
+function playerSort(sort, btn) {
+  currentPlayerSort = sort
+  document.querySelectorAll('#page-players .filter-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  const val = document.getElementById('player-search').value
+  if (val.trim()) fetchPlayers(val)
+}
+
+function searchPlayers(val) {
+  clearTimeout(searchTimer)
+  if (!val.trim()) { document.getElementById('player-list').innerHTML = '<div class="state-msg">Search a name to pull a dossier.</div>'; return }
+  searchTimer = setTimeout(() => fetchPlayers(val), 280)
+}
+
+async function fetchPlayers(name) {
+  const el = document.getElementById('player-list')
+  el.innerHTML = '<div class="state-msg">Searching files...</div>'
+  let q = sb.from('player_stats').select('*').eq('status','approved').ilike('player_name',`%${name}%`)
+  if (currentPlayerSort === 'kills') q = q.order('kills',{ascending:false})
+  else if (currentPlayerSort === 'wins') q = q.order('wins',{ascending:false})
+  else if (currentPlayerSort === 'playtime') q = q.order('playtime_hours',{ascending:false})
+  else q = q.order('kills',{ascending:false})
+  let data
+  try { ({ data } = await q.limit(30)) }
+  catch(e) { el.innerHTML = '<div class="state-msg">Search failed — check back later.</div>'; return }
+  if (!data?.length) { el.innerHTML = `<div class="state-msg">No record found for "${esc(name)}".</div>`; return }
+  let rows = data
+  if (currentPlayerSort === 'kd') rows = [...data].sort((a,b) => kd(b.kills,b.deaths) - kd(a.kills,a.deaths))
+  el.innerHTML = `<div class="card-list">${rows.map(p => `
+    <div class="card-item">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
+        <div>
+          <div class="card-title">${esc(p.player_name)}</div>
+          <div class="card-meta" style="margin-top:3px">${[p.rank].filter(Boolean).join(' · ')}</div>
+        </div>
+        ${factionPill(p.faction)}
+      </div>
+      <div class="chips">
+        ${p.clan ? `<div class="chip">Crew <b>${esc(p.clan)}</b></div>` : ''}
+        ${p.kills != null ? `<div class="chip">Kills <b>${p.kills.toLocaleString()}</b></div>` : ''}
+        ${p.deaths != null ? `<div class="chip">Deaths <b>${p.deaths.toLocaleString()}</b></div>` : ''}
+        ${p.kills != null && p.deaths != null ? `<div class="chip">K/D <b>${kd(p.kills,p.deaths).toFixed(2)}</b></div>` : ''}
+        ${p.wins != null ? `<div class="chip">Wins <b>${p.wins}</b></div>` : ''}
+        ${p.losses != null ? `<div class="chip">Losses <b>${p.losses}</b></div>` : ''}
+        ${p.playtime_hours != null ? `<div class="chip">Time in city <b>${p.playtime_hours}h</b></div>` : ''}
+      </div>
+      ${p.notes ? `<div style="margin-top:0.6rem; font-size:0.82rem; color:var(--muted); font-style:italic">${esc(p.notes)}</div>` : ''}
+    </div>
+  `).join('')}</div>`
+}
+
+
+// ── CLANS ──
+function filterClanType(type, btn) {
+  currentClanType = type
+  document.querySelectorAll('#page-clans .filter-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  const val = document.getElementById('clan-search').value
+  if (val.trim()) fetchClans(val)
+}
+
+function searchClans(val) {
+  clearTimeout(searchTimer)
+  if (!val.trim()) { document.getElementById('clan-list').innerHTML = '<div class="state-msg">Search a clan name to pull records.</div>'; return }
+  searchTimer = setTimeout(() => fetchClans(val), 280)
+}
+
+async function fetchClans(name) {
+  const el = document.getElementById('clan-list')
+  el.innerHTML = '<div class="state-msg">Searching files...</div>'
+  let q = sb.from('clan_history').select('*').eq('status','approved').ilike('clan_name',`%${name}%`)
+  if (currentClanType !== 'all') q = q.eq('event_type', currentClanType)
+  let data
+  try { ({ data } = await q.order('event_date',{ascending:true})) }
+  catch(e) { el.innerHTML = '<div class="state-msg">Search failed — check back later.</div>'; return }
+  if (!data?.length) { el.innerHTML = `<div class="state-msg">No record found.</div>`; return }
+  const grouped = {}
+  data.forEach(e => { if (!grouped[e.clan_name]) grouped[e.clan_name] = []; grouped[e.clan_name].push(e) })
+  el.innerHTML = Object.entries(grouped).map(([clan, events]) => `
+    <div class="card-item">
+      <div class="card-title" style="margin-bottom:1rem; font-size:1.1rem">${esc(clan)}</div>
+      <div class="timeline">${events.map(e => `
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-date">${fmtDate(e.event_date)}</div>
+          <div class="tl-title">${esc(e.title)}<span class="tl-type">${e.event_type.replace(/_/g,' ')}</span></div>
+          <div class="tl-desc">${esc(e.description)}</div>
+        </div>
+      `).join('')}</div>
+    </div>
+  `).join('')
+}
+
+// ── WARS ──
+async function loadWars() {
+  const el = document.getElementById('war-list')
+  let data
+  try { ({ data } = await sb.from('clan_wars').select('*').eq('status','approved').order('war_date',{ascending:false}).limit(60)) }
+  catch(e) { el.innerHTML = '<div class="state-msg">Could not load war reports. Check back later.</div>'; return }
+  allWarData = data || []
+  renderWars(allWarData)
+}
+
+function filterWars(val) {
+  if (!val.trim()) { renderWars(allWarData); return }
+  const v = val.toLowerCase()
+  renderWars(allWarData.filter(w => w.clan_a.toLowerCase().includes(v) || w.clan_b.toLowerCase().includes(v)))
+}
+
+function renderWars(data) {
+  const el = document.getElementById('war-list')
+  if (!data?.length) { el.innerHTML = '<div class="state-msg">No war reports on file yet.</div>'; return }
+  el.innerHTML = `<div class="card-list">${data.map(w => `
+    <div class="card-item">
+      <div class="war-matchup">
+        <div class="war-clan ${w.winner !== w.clan_a ? 'lost' : ''}">${esc(w.clan_a)}</div>
+        <div class="war-score-mid">${w.clan_a_kills != null ? `${w.clan_a_kills} — ${w.clan_b_kills}` : 'vs'}</div>
+        <div class="war-clan ${w.winner !== w.clan_b ? 'lost' : ''}">${esc(w.clan_b)}</div>
+        <span class="war-winner-badge">Victor: ${esc(w.winner)}</span>
+      </div>
+      ${w.description ? `<div style="margin-top:0.6rem; font-size:0.84rem; color:var(--muted); font-style:italic">${esc(w.description)}</div>` : ''}
+      <div class="card-meta" style="margin-top:0.6rem">${fmtDate(w.war_date)}</div>
+    </div>
+  `).join('')}</div>`
+}
+
+// ── LEADERBOARD ──
+async function loadLeaderboard() {
+  const el = document.getElementById('lb-list')
+  let data
+  try { ({ data } = await sb.from('player_stats').select('*').eq('status','approved').limit(200)) }
+  catch(e) { el.innerHTML = '<div class="state-msg">Could not load the board. Check back later.</div>'; return }
+  allLbData = data || []
+  renderPlayerLb()
+  loadClanLb()
+}
+
+function lbSort(sort, btn) {
+  if (currentLbSort === sort) {
+    currentLbSort = null
+    btn.classList.remove('active')
+  } else {
+    currentLbSort = sort
+    document.querySelectorAll('#page-leaderboard .filter-bar:nth-of-type(2) .filter-btn').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+  }
+  renderPlayerLb()
+}
+
+function lbFaction(faction, btn) {
+  currentLbFaction = faction
+  document.querySelectorAll('#lb-faction-strip .faction-block').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderPlayerLb()
+}
+
+function renderPlayerLb() {
+  const el = document.getElementById('lb-list')
+  let data = [...allLbData]
+  if (currentLbFaction !== 'all') data = data.filter(p => p.faction === currentLbFaction)
+  const sorters = {
+    kills: (a,b) => (b.kills||0)-(a.kills||0),
+    deaths: (a,b) => (b.deaths||0)-(a.deaths||0),
+    wins: (a,b) => (b.wins||0)-(a.wins||0),
+    kd: (a,b) => kd(b.kills,b.deaths)-kd(a.kills,a.deaths),
+    playtime: (a,b) => (b.playtime_hours||0)-(a.playtime_hours||0),
+  }
+  if (currentLbSort) data.sort(sorters[currentLbSort])
+
+  if (!data.length) { el.innerHTML = '<div class="state-msg">No records for this family.</div>'; return }
+
+  const labels = {kills:'Kills',deaths:'Deaths',wins:'Wins',kd:'K/D',playtime:'Hrs'}
+  const getValue = p => {
+    if (currentLbSort==='kills') return (p.kills||0).toLocaleString()
+    if (currentLbSort==='deaths') return (p.deaths||0).toLocaleString()
+    if (currentLbSort==='wins') return (p.wins||0).toLocaleString()
+    if (currentLbSort==='kd') return kd(p.kills,p.deaths).toFixed(2)
+    if (currentLbSort==='playtime') return (p.playtime_hours||0)+'h'
+    return null
+  }
+  const rankCls = i => i===0?'gold':i===1?'silver':i===2?'bronze':''
+  const rankLbl = i => i===0?'I':i===1?'II':i===2?'III':`${i+1}`
+  const showSortCol = !!currentLbSort
+
+  el.innerHTML = `<div class="lb-wrap"><table class="lb-table">
+    <thead><tr>
+      <th style="width:44px">No.</th>
+      <th>Name</th>
+      <th>Family</th>
+      <th>Crew</th>
+      ${showSortCol ? `<th class="r">${labels[currentLbSort]}</th>` : ''}
+      <th class="r">K/D</th>
+      <th class="r">Wins</th>
+    </tr></thead>
+    <tbody>${data.slice(0,50).map((p,i) => `
+      <tr class="lb-tr">
+        <td class="lb-td lb-rank ${rankCls(i)}">${rankLbl(i)}</td>
+        <td class="lb-td"><div class="lb-name">${esc(p.player_name)}</div>${p.rank?`<div class="lb-sub">${esc(p.rank)}</div>`:''}</td>
+        <td class="lb-td">${factionPill(p.faction)}</td>
+        <td class="lb-td" style="font-size:0.82rem; color:var(--muted); font-style:italic">${p.clan?esc(p.clan):'—'}</td>
+        ${showSortCol ? `<td class="lb-td r">${getValue(p)}</td>` : ''}
+        <td class="lb-td r">${p.kills!=null&&p.deaths!=null?kd(p.kills,p.deaths).toFixed(2):'—'}</td>
+        <td class="lb-td r">${p.wins!=null?p.wins:'—'}</td>
+      </tr>
+    `).join('')}</tbody>
+  </table></div>`
+}
+
+async function loadClanLb() {
+  const el = document.getElementById('clan-lb-list')
+  let data
+  try { ({ data } = await sb.from('clan_leaderboard').select('*').eq('status','approved').order('war_score',{ascending:false}).limit(20)) }
+  catch(e) { el.innerHTML = '<div class="state-msg">Could not load clan standings. Check back later.</div>'; return }
+  if (!data?.length) { el.innerHTML = '<div class="state-msg">No clan standings on record.</div>'; return }
+  const rankCls = i => i===0?'gold':i===1?'silver':i===2?'bronze':''
+  const rankLbl = i => i===0?'I':i===1?'II':i===2?'III':`${i+1}.`
+  el.innerHTML = data.map((c,i) => `
+    <div class="clan-row">
+      <div class="clan-rank ${rankCls(i)}">${rankLbl(i)}</div>
+      <div class="clan-name">${esc(c.clan_name)} ${c.faction?`<span style="font-size:0.78rem; font-weight:300; color:var(--muted2); font-style:italic">(${esc(c.faction)})</span>`:''}</div>
+      <div class="clan-stats">
+        <span>Score <b>${c.war_score}</b></span>
+        <span>Wins <b>${c.total_wins}</b></span>
+        <span>Kills <b>${c.total_kills}</b></span>
+        <span>Members <b>${c.member_count}</b></span>
+      </div>
+    </div>
+  `).join('')
+}
+
+// ── NEWS ──
+async function loadNews() {
+  const el = document.getElementById('news-list')
+  let data
+  try { ({ data } = await sb.from('news').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(40)) }
+  catch(e) { el.innerHTML = '<div class="state-msg">Could not load intelligence. Check back later.</div>'; return }
+  allNewsData = data || []
+  renderNews(allNewsData)
+}
+
+function filterNews(cat, btn) {
+  document.querySelectorAll('#page-news .filter-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderNews(cat==='all' ? allNewsData : allNewsData.filter(n => n.category===cat))
+}
+
+function agencyBadge(agency) {
+  if (!agency) return ''
+  const cls = agency === 'Crab City Chronicle' ? 'agency-ccc' : 'agency-dnh'
+  return `<span class="agency-badge ${cls}">${esc(agency)}</span>`
+}
+
+function renderNews(data) {
+  const el = document.getElementById('news-list')
+  if (!data?.length) { el.innerHTML = '<div class="state-msg">Nothing on the wire yet.</div>'; return }
+  el.innerHTML = `<div class="card-list">${data.map(n => `
+    <div class="card-item">
+      ${n.image_url ? `<img class="news-image" src="${esc(n.image_url)}" alt="${esc(n.title)}" loading="lazy">` : ''}
+      ${agencyBadge(n.agency)}
+      <div class="news-cat">${n.category}</div>
+      <div class="news-headline">${esc(n.title)}</div>
+      ${n.content ? `<div class="news-body">${esc(n.content)}</div>` : ''}
+      <div class="card-meta" style="margin-top:0.75rem">${fmtDate(n.created_at)}</div>
+    </div>
+  `).join('')}</div>`
+}
+
+// ── PATCHES ──
+async function loadPatches() {
+  const el = document.getElementById('patch-list')
+  let data
+  try { ({ data } = await sb.from('dev_patches').select('*').eq('status','approved').order('patch_date',{ascending:false}).limit(30)) }
+  catch(e) { el.innerHTML = '<div class="state-msg">Could not load dispatches. Check back later.</div>'; return }
+  if (!data?.length) { el.innerHTML = '<div class="state-msg">No dispatches filed yet.</div>'; return }
+  el.innerHTML = `<div class="card-list">${data.map(p => `
+    <div class="card-item">
+      <div style="display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <span class="patch-ver">v${esc(p.version)}</span>
+        <span class="card-title" style="margin:0">${esc(p.title)}</span>
+        <span class="card-meta" style="margin-left:auto">${fmtDate(p.patch_date)}</span>
+      </div>
+      <div class="patch-body">${esc(p.content)}</div>
+    </div>
+  `).join('')}</div>`
+}
+
+// ── REAL-TIME ──
+sb.channel('archive-live')
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'player_stats'}, () => { if(currentPage==='leaderboard') loadLeaderboard() })
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'clan_leaderboard'}, () => { if(currentPage==='leaderboard') loadClanLb() })
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'news'}, () => { if(currentPage==='news') loadNews() })
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dev_patches'}, () => { if(currentPage==='patches') loadPatches() })
+  .subscribe()
+
+// ── HELPERS ──
+function esc(s) {
+  if (!s) return ''
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+function fmtDate(d) {
+  if (!d) return ''
+  return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})
+}
+function kd(k,d) { return (k||0)/Math.max(d||1,1) }
+
+function factionPill(f) {
+  if (!f) return `<span class="faction-pill fp-default">Unknown</span>`
+  const key = f.toLowerCase()
+  const cls = key.includes('romano')?'fp-romanos':key.includes('gonzalez')?'fp-gonzalezes':key.includes('ivanov')?'fp-ivanovs':key.includes('yamamoto')?'fp-yamamotos':key.includes('police')?'fp-police':'fp-default'
+  return `<span class="faction-pill ${cls}">${esc(f)}</span>`
+}
+
+function factionColor(f) {
+  if (!f) return 'var(--text)'
+  const key = f.toLowerCase()
+  if (key.includes('romano')) return 'var(--romano)'
+  if (key.includes('gonzalez')) return 'var(--gonzalez)'
+  if (key.includes('ivanov')) return 'var(--ivanov)'
+  if (key.includes('yamamoto')) return 'var(--yamamoto)'
+  if (key.includes('police')) return 'var(--police)'
+  return 'var(--text)'
+}
+
+loadHomeCounts()
+loadHomePreviews()
+
+// ── AUTH STATE ──
+let currentUser = null
+
+function initAuth() {
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('login') === 'success') {
+    const user = {
+      discord_id: params.get('discord_id'),
+      username: params.get('username'),
+      avatar: params.get('avatar'),
+    }
+    localStorage.setItem('ccc_user', JSON.stringify(user))
+    window.history.replaceState({}, '', '/')
+    setUser(user)
+  } else {
+    const stored = localStorage.getItem('ccc_user')
+    if (stored) setUser(JSON.parse(stored))
+  }
+}
+
+function setUser(user) {
+  currentUser = user
+  document.getElementById('login-btn').style.display = 'none'
+  const ui = document.getElementById('user-info')
+  ui.style.display = 'flex'
+  document.getElementById('user-name').textContent = user.username
+  if (user.avatar) {
+    document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.avatar}.png?size=64`
+  } else {
+    document.getElementById('user-avatar').style.display = 'none'
+  }
+  document.getElementById('submit-gate').style.display = 'none'
+  document.getElementById('submit-forms').style.display = 'block'
+}
+
+function logout() {
+  localStorage.removeItem('ccc_user')
+  currentUser = null
+  document.getElementById('login-btn').style.display = 'inline-flex'
+  document.getElementById('user-info').style.display = 'none'
+  document.getElementById('submit-gate').style.display = 'block'
+  document.getElementById('submit-forms').style.display = 'none'
+}
+
+// ── FORM TABS ──
+function switchForm(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', ['player','faction','video'][i] === tab))
+  document.getElementById('form-player').style.display = tab === 'player' ? 'block' : 'none'
+  document.getElementById('form-faction').style.display = tab === 'faction' ? 'block' : 'none'
+  document.getElementById('form-video').style.display = tab === 'video' ? 'block' : 'none'
+}
+
+// ── FILE HANDLING ──
+let selectedFile = null
+
+function handleFileSelect(input) {
+  selectedFile = input.files[0]
+  document.getElementById('file-name').textContent = selectedFile ? selectedFile.name : 'No file selected'
+}
+
+function handleDrop(e) {
+  e.preventDefault()
+  document.getElementById('file-drop').classList.remove('drag')
+  const file = e.dataTransfer.files[0]
+  if (file) {
+    selectedFile = file
+    document.getElementById('file-name').textContent = file.name
+  }
+}
+
+function showMsg(id, type, text) {
+  const el = document.getElementById(id)
+  el.className = `form-msg ${type}`
+  el.textContent = text
+  el.style.display = 'block'
+}
+
+// ── SUBMIT PLAYER ──
+async function submitPlayer() {
+  if (!currentUser) return
+  const name = document.getElementById('p-name').value.trim()
+  const faction = document.getElementById('p-faction').value
+  const kills = document.getElementById('p-kills').value
+  const deaths = document.getElementById('p-deaths').value
+  if (!name || !faction || kills === '' || deaths === '') return showMsg('p-msg', 'error', 'Please fill in all required fields.')
+
+  const btn = document.querySelector('#form-player .form-submit')
+  btn.disabled = true; btn.textContent = 'Submitting...'
+
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'player_stats',
+        discord_id: currentUser.discord_id,
+        discord_username: currentUser.username,
+        player_name: name,
+        faction,
+        clan: document.getElementById('p-clan').value || null,
+        rank: document.getElementById('p-rank').value || null,
+        kills: parseInt(kills),
+        deaths: parseInt(deaths),
+        wins: document.getElementById('p-wins').value ? parseInt(document.getElementById('p-wins').value) : null,
+        losses: document.getElementById('p-losses').value ? parseInt(document.getElementById('p-losses').value) : null,
+        playtime_hours: document.getElementById('p-playtime').value ? parseFloat(document.getElementById('p-playtime').value) : null,
+        notes: document.getElementById('p-notes').value || null,
+      })
+    })
+    const data = await res.json()
+    if (data.success) showMsg('p-msg', 'success', `Submitted successfully. Entry ID: ${data.id}. A mod will review it shortly.`)
+    else showMsg('p-msg', 'error', data.error || 'Submission failed.')
+  } catch (e) { showMsg('p-msg', 'error', 'Network error. Please try again.') }
+
+  btn.disabled = false; btn.textContent = 'Submit for review'
+}
+
+// ── SUBMIT FACTION ──
+async function submitFaction() {
+  if (!currentUser) return
+  const faction = document.getElementById('f-faction').value
+  if (!faction) return showMsg('f-msg', 'error', 'Please select a faction.')
+
+  const btn = document.querySelector('#form-faction .form-submit')
+  btn.disabled = true; btn.textContent = 'Submitting...'
+
+  try {
+    const res = await fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'faction_stats',
+        discord_id: currentUser.discord_id,
+        discord_username: currentUser.username,
+        faction_name: faction,
+        total_members: document.getElementById('f-members').value ? parseInt(document.getElementById('f-members').value) : null,
+        territory_count: document.getElementById('f-territory').value ? parseInt(document.getElementById('f-territory').value) : null,
+        wins: document.getElementById('f-wins').value ? parseInt(document.getElementById('f-wins').value) : null,
+        losses: document.getElementById('f-losses').value ? parseInt(document.getElementById('f-losses').value) : null,
+        description: document.getElementById('f-desc').value || null,
+      })
+    })
+    const data = await res.json()
+    if (data.success) showMsg('f-msg', 'success', `Submitted successfully. Entry ID: ${data.id}. A mod will review it shortly.`)
+    else showMsg('f-msg', 'error', data.error || 'Submission failed.')
+  } catch (e) { showMsg('f-msg', 'error', 'Network error. Please try again.') }
+
+  btn.disabled = false; btn.textContent = 'Submit for review'
+}
+
+// ── SUBMIT VIDEO ──
+async function submitVideo() {
+  if (!currentUser) return
+  const name = document.getElementById('v-name').value.trim()
+  const faction = document.getElementById('v-faction').value
+  const kills = document.getElementById('v-kills').value
+  const deaths = document.getElementById('v-deaths').value
+  if (!name || !faction || kills === '' || deaths === '') return showMsg('v-msg', 'error', 'Please fill in all required fields.')
+  if (!selectedFile) return showMsg('v-msg', 'error', 'Please select a video file.')
+  if (selectedFile.size > 50 * 1024 * 1024) return showMsg('v-msg', 'error', 'File is too large. Maximum 50MB.')
+
+  const btn = document.getElementById('v-submit')
+  btn.disabled = true; btn.textContent = 'Uploading...'
+
+  try {
+    const formData = new FormData()
+    formData.append('type', 'video')
+    formData.append('discord_id', currentUser.discord_id)
+    formData.append('discord_username', currentUser.username)
+    formData.append('player_name', name)
+    formData.append('faction', faction)
+    formData.append('clan', document.getElementById('v-clan').value || '')
+    formData.append('rank', document.getElementById('v-rank').value || '')
+    formData.append('kills', kills)
+    formData.append('deaths', deaths)
+    formData.append('wins', document.getElementById('v-wins').value || '')
+    formData.append('video', selectedFile)
+
+    const res = await fetch('/api/submit', { method: 'POST', body: formData })
+    const data = await res.json()
+    if (data.success) showMsg('v-msg', 'success', `Video uploaded successfully. Entry ID: ${data.id}. A mod will review your video shortly.`)
+    else showMsg('v-msg', 'error', data.error || 'Upload failed.')
+  } catch (e) { showMsg('v-msg', 'error', 'Network error. Please try again.') }
+
+  btn.disabled = false; btn.textContent = 'Upload and submit'
+}
+
+initAuth()
+
+</script>
+</body>
+</html>
