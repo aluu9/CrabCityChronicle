@@ -1300,10 +1300,7 @@ function searchClans(val) {
   clearTimeout(searchTimer)
   if (!val.trim()) { document.getElementById('clan-list').innerHTML = '<div class="state-msg">Search a clan name to pull records.</div>'; return }
   searchTimer = setTimeout(() => fetchClans(val), 280)
-}
-
-Clan records patch · JS
- 
+} 
 async function loadClans() {
   const el = document.getElementById('clan-list')
   el.innerHTML = '<div class="state-msg">Loading...</div>'
