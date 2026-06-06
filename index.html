@@ -1142,6 +1142,7 @@ function show(page) {
 }
 
 function loadPage(p) {
+  if (p === 'clans') loadClans()
   if (p === 'wars') loadWars()
   if (p === 'leaderboard') loadLeaderboard()
   if (p === 'news') loadNews()
@@ -1162,7 +1163,7 @@ async function loadHomePreviews() {
             <span class="patch-ver">v${esc(p.version)}</span>
             <span style="font-family:var(--font-head); font-weight:700; font-size:0.92rem;">${esc(p.title)}</span>
           </div>
-          <div style="font-family:var(--font-body); font-size:0.85rem; color:var(--muted); font-style:italic; line-height:1.65; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;">${esc(p.content).replace(/\n/g, '<br>')}</div>`
+          <div style="font-family:var(--font-body); font-size:0.85rem; color:var(--muted); font-style:italic; line-height:1.65; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden;">${esc(p.content)}</div>
           <div style="font-family:var(--font-mono); font-size:0.62rem; color:var(--muted2); text-transform:uppercase; letter-spacing:0.07em; margin-top:0.6rem;">${fmtDate(p.patch_date)}</div>
         </div>`
     }
@@ -1171,7 +1172,7 @@ async function loadHomePreviews() {
   // Latest news
   const newsEl = document.getElementById('home-news')
   try {
-    const { data: news } = await sb.from('news').select('*').eq('status','approved').order('patch_date',{ascending:false,nullsFirst:false}).limit(1)
+    const { data: news } = await sb.from('news').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(1)
     if (news?.length) {
       const n = news[0]
       newsEl.innerHTML = `
@@ -1657,7 +1658,7 @@ async function saveEdit(id, table, field) {
       // Update displayed content
       const bodyEl = document.getElementById(table === 'news' ? 'news-body-' + id : 'patch-body-' + id)
       if (bodyEl) bodyEl.innerHTML = newValue.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')
-      setTimeout(() => closeEditor(id), 1000)
+      setTimeout(() => { closeEditor(id); loadHomePreviews() }, 1000)
     } else {
       status.textContent = 'Error: ' + (data.error || 'failed')
       status.style.color = 'red'
