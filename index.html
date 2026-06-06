@@ -706,6 +706,33 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
 .fb-yamamotos { background: var(--yamamoto); color: #f0e8ff; }
 .fb-police { background: var(--police); color: #e8f0ff; }
 .fb-all { background: var(--ink); color: var(--paper); }
+  .clan-card { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--rule); background: var(--paper); }
+.clan-card:last-child { border-bottom: none; }
+.clan-card:nth-child(even) { background: var(--paper2); }
+.clan-card-header { display: flex; align-items: flex-start; gap: 1rem; }
+.clan-logo { width: 64px; height: 64px; object-fit: cover; border-radius: 2px; border: 1px solid var(--rule2); flex-shrink: 0; }
+.clan-logo-placeholder { width: 64px; height: 64px; border-radius: 2px; border: 1px dashed var(--rule2); flex-shrink: 0; background: var(--paper3); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.55rem; color: var(--aged2); text-transform: uppercase; text-align:center; }
+.clan-info { flex: 1; min-width: 0; }
+.clan-card-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+.clan-meta-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 0.5rem; }
+.clan-wdl { margin: 0.6rem 0 0; }
+.clan-wdl-label { font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+.clan-wdl-bar { display: flex; height: 7px; border-radius: 2px; overflow: hidden; background: var(--rule); width: 100%; max-width: 260px; }
+.clan-wdl-w { background: #2d7a3a; }
+.clan-wdl-d { background: #8c7d6c; }
+.clan-wdl-l { background: #8b1a1a; }
+.clan-wdl-nums { display: flex; gap: 0.75rem; margin-top: 4px; font-family: var(--font-mono); font-size: 0.62rem; }
+.clan-wdl-nums span { color: var(--muted2); }
+.clan-history-toggle { display: inline-flex; align-items: center; gap: 5px; margin-top: 0.85rem; font-family: var(--font-mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); cursor: pointer; user-select: none; border-bottom: 1px solid transparent; transition: color 0.15s, border-color 0.15s; }
+.clan-history-toggle:hover { color: var(--text); border-color: var(--rule2); }
+.toggle-arrow { transition: transform 0.2s; display: inline-block; }
+.clan-history-toggle.open .toggle-arrow { transform: rotate(90deg); }
+.clan-history-preview { margin-top: 0.6rem; padding: 0.6rem 0.75rem; background: var(--paper3); border-left: 2px solid var(--rule2); border-radius: 0 2px 2px 0; font-size: 0.82rem; color: var(--muted); font-style: italic; }
+.clan-history-full { display: none; margin-top: 0.75rem; }
+.clan-history-full.open { display: block; }
+.clan-invite-link { font-family: var(--font-mono); font-size: 0.62rem; color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--rule2); transition: color 0.15s; display: inline-block; margin-top: 0.3rem; }
+.clan-invite-link:hover { color: var(--text); }
+.cms-img-row { display: flex; gap: 6px; margin-top: 0.75rem; flex-wrap: wrap; }
 
 @media (max-width: 580px) { #home-latest-grid { grid-template-columns: 1fr !important; } }
 </style>
@@ -1275,69 +1302,238 @@ function searchClans(val) {
   searchTimer = setTimeout(() => fetchClans(val), 280)
 }
 
+Clan records patch · JS
+// ═══════════════════════════════════════════════════════════════
+// CLAN RECORDS — UPDATED loadClans function
+// ═══════════════════════════════════════════════════════════════
+ 
 async function loadClans() {
   const el = document.getElementById('clan-list')
   el.innerHTML = '<div class="state-msg">Loading...</div>'
-
-  let factions = [], history = []
+ 
+  let factions = [], history = [], wars = []
   try {
-    const [fRes, hRes] = await Promise.all([
+    const [fRes, hRes, wRes] = await Promise.all([
       sb.from('faction_stats').select('*').eq('status','approved').order('faction_name',{ascending:true}),
-      sb.from('clan_history').select('*').eq('status','approved').order('event_date',{ascending:true})
+      sb.from('clan_history').select('*').eq('status','approved').order('event_date',{ascending:false}),
+      sb.from('clan_wars').select('clan_a,clan_b,winner').eq('status','approved')
     ])
     factions = fRes.data || []
     history = hRes.data || []
+    wars = wRes.data || []
   } catch(e) {
     el.innerHTML = '<div class="state-msg">Could not load clan records. Check back later.</div>'
     return
   }
-
+ 
   if (!factions.length && !history.length) {
     el.innerHTML = '<div class="state-msg">No clans registered yet.</div>'
     return
   }
-
-  // Group history by clan name
+ 
   const grouped = {}
   history.forEach(e => { if (!grouped[e.clan_name]) grouped[e.clan_name] = []; grouped[e.clan_name].push(e) })
-
-  // All unique clan names — factions first, then any with only history
+ 
+  function getWDL(clanName) {
+    let w = 0, l = 0
+    wars.forEach(war => {
+      const inWar = war.clan_a === clanName || war.clan_b === clanName
+      if (!inWar) return
+      if (war.winner === clanName) w++
+      else if (war.winner && war.winner !== clanName) l++
+    })
+    return { w, d: 0, l, total: w + l }
+  }
+ 
   const allNames = [...new Set([...factions.map(f => f.faction_name), ...Object.keys(grouped)])]
-
-  el.innerHTML = '<div class="card-list">' + allNames.map(clan => {
+ 
+  el.innerHTML = '<div class="card-list">' + allNames.map((clan, idx) => {
     const reg = factions.find(f => f.faction_name === clan)
     const events = grouped[clan] || []
-
-    const regHtml = reg ? `
-      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:0.85rem;">
+    const wdl = getWDL(clan)
+    const mostRecent = events[0] || null
+    const uid = 'clan-' + idx
+ 
+    const total = wdl.total || 1
+    const wPct = Math.round((wdl.w / total) * 100)
+    const lPct = 100 - wPct
+    const wdlHtml = wdl.total > 0 ? `
+      <div class="clan-wdl">
+        <div class="clan-wdl-label">War Record</div>
+        <div class="clan-wdl-bar">
+          ${wPct > 0 ? `<div class="clan-wdl-w" style="width:${wPct}%"></div>` : ''}
+          ${lPct > 0 ? `<div class="clan-wdl-l" style="width:${lPct}%"></div>` : ''}
+        </div>
+        <div class="clan-wdl-nums">
+          <span>W <b style="color:#2d7a3a">${wdl.w}</b></span>
+          <span>D <b>0</b></span>
+          <span>L <b style="color:#8b1a1a">${wdl.l}</b></span>
+        </div>
+      </div>` : ''
+ 
+    const logoHtml = reg?.image_proof
+      ? `<img class="clan-logo" src="${esc(reg.image_proof)}" alt="${esc(clan)} logo" id="logo-img-${uid}">`
+      : `<div class="clan-logo-placeholder" id="logo-img-${uid}">No<br>Logo</div>`
+ 
+    const metaHtml = reg ? `
+      <div class="clan-meta-row">
         ${reg.team ? factionPill(reg.team) : ''}
         ${reg.total_members != null ? `<span class="chip">Members <b>${reg.total_members}</b></span>` : ''}
         ${reg.date_started ? `<span class="chip">Est. <b>${fmtDate(reg.date_started)}</b></span>` : ''}
-        ${reg.owners ? `<span class="chip">Owner(s) <b>${esc(reg.owners)}</b></span>` : ''}
+        ${reg.owners ? `<span class="chip">Owners <b>${esc(reg.owners)}</b></span>` : ''}
       </div>
-      ${reg.image_proof ? `<img src="${esc(reg.image_proof)}" alt="${esc(clan)} banner" style="max-width:100%;max-height:180px;object-fit:cover;border-radius:2px;margin-bottom:0.85rem;display:block;border:1px solid var(--rule2);">` : ''}
-      ${reg.invite_link ? `<div style="margin-bottom:0.85rem;font-size:0.82rem;color:var(--muted);font-style:italic;">Discord: <a href="${esc(reg.invite_link)}" target="_blank" style="color:var(--text);text-decoration:underline;">${esc(reg.invite_link)}</a></div>` : ''}
+      ${reg.invite_link ? `<a href="${esc(reg.invite_link)}" target="_blank" class="clan-invite-link">↗ Discord Server</a>` : ''}
     ` : ''
-
-    const timelineHtml = events.length ? `
-      <div style="font-family:var(--font-mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.6rem;margin-top:${reg ? '0.75rem' : '0'};">History</div>
-      <div class="timeline">${events.map(e => `
-        <div class="tl-item">
-          <div class="tl-dot"></div>
-          <div class="tl-date">${fmtDate(e.event_date)}</div>
-          <div class="tl-title">${esc(e.title)}<span class="tl-type">${e.event_type.replace(/_/g,' ')}</span></div>
-          <div class="tl-desc">${esc(e.description)}</div>
+ 
+    const previewHtml = mostRecent ? `
+      <div class="clan-history-preview">
+        <b>${esc(mostRecent.title)}</b>
+        <span class="tl-type" style="font-size:0.58rem">${mostRecent.event_type.replace(/_/g,' ')}</span>
+        · ${fmtDate(mostRecent.event_date)}
+      </div>` : ''
+ 
+    const histToggle = events.length ? `
+      ${previewHtml}
+      <div class="clan-history-toggle" onclick="toggleHistory('${uid}', this)">
+        <span class="toggle-arrow">▶</span>
+        ${events.length} event${events.length !== 1 ? 's' : ''} in history
+      </div>
+      <div class="clan-history-full" id="hist-${uid}">
+        <div class="timeline">${events.map(e => `
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-date">${fmtDate(e.event_date)}</div>
+            <div class="tl-title">${esc(e.title)}<span class="tl-type">${e.event_type.replace(/_/g,' ')}</span></div>
+            <div class="tl-desc">${esc(e.description)}</div>
+          </div>`).join('')}
         </div>
-      `).join('')}</div>
-    ` : ''
-
-    return `
-      <div class="card-item">
-        <div class="card-title" style="margin-bottom:0.75rem;font-size:1.1rem">${esc(clan)}</div>
-        ${regHtml}${timelineHtml}
+      </div>` : ''
+ 
+    const editBtns = reg ? `
+      <div class="cms-img-row">
+        <button class="edit-btn" style="margin-left:0" onclick="openClanLogoEditor('${uid}')">Change Logo</button>
+        <button class="edit-btn" style="margin-left:0" onclick="openClanTextEditor('${uid}','${reg.id}','${esc(reg.owners||'')}','${reg.total_members||''}','${esc(reg.invite_link||'')}')">Edit Details</button>
       </div>
-    `
+      <div id="logo-editor-${uid}" style="display:none;margin-top:0.75rem;padding:0.75rem;background:var(--paper3);border:1px solid var(--rule2);border-radius:2px;">
+        <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Upload new logo</div>
+        <input type="file" id="logo-file-${uid}" accept="image/png,image/jpeg,image/webp,image/gif" style="font-size:0.8rem;">
+        <div style="display:flex;gap:6px;margin-top:8px;align-items:center;">
+          <button class="cms-save" onclick="saveClanLogo('${uid}','${reg.id}')">Upload</button>
+          <button class="cms-cancel" onclick="document.getElementById('logo-editor-${uid}').style.display='none'">Cancel</button>
+          <span id="logo-status-${uid}" style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);"></span>
+        </div>
+      </div>
+      <div id="text-editor-${uid}" style="display:none;margin-top:0.75rem;padding:0.75rem;background:var(--paper3);border:1px solid var(--rule2);border-radius:2px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Owners</div>
+            <input class="form-input" id="te-owners-${uid}" type="text" style="font-size:0.82rem;padding:4px 8px;">
+          </div>
+          <div>
+            <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Members</div>
+            <input class="form-input" id="te-members-${uid}" type="number" style="font-size:0.82rem;padding:4px 8px;">
+          </div>
+        </div>
+        <div style="margin-bottom:0.5rem;">
+          <div style="font-family:var(--font-mono);font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Invite Link</div>
+          <input class="form-input" id="te-invite-${uid}" type="text" style="font-size:0.82rem;padding:4px 8px;">
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="cms-save" onclick="saveClanDetails('${uid}','${reg.id}')">Save</button>
+          <button class="cms-cancel" onclick="document.getElementById('text-editor-${uid}').style.display='none'">Cancel</button>
+          <span id="te-status-${uid}" style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);"></span>
+        </div>
+      </div>` : ''
+ 
+    return `
+      <div class="clan-card">
+        <div class="clan-card-header">
+          ${logoHtml}
+          <div class="clan-info">
+            <div class="clan-card-title">${esc(clan)}</div>
+            ${metaHtml}
+            ${wdlHtml}
+          </div>
+        </div>
+        ${editBtns}
+        ${histToggle}
+      </div>`
   }).join('') + '</div>'
+}
+ 
+function toggleHistory(uid, btn) {
+  const hist = document.getElementById('hist-' + uid)
+  hist.classList.toggle('open')
+  btn.classList.toggle('open')
+}
+ 
+function openClanLogoEditor(uid) {
+  const el = document.getElementById('logo-editor-' + uid)
+  el.style.display = el.style.display === 'none' ? 'block' : 'none'
+}
+ 
+function openClanTextEditor(uid, id, owners, members, invite) {
+  const el = document.getElementById('text-editor-' + uid)
+  el.style.display = el.style.display === 'none' ? 'block' : 'none'
+  document.getElementById('te-owners-' + uid).value = owners
+  document.getElementById('te-members-' + uid).value = members
+  document.getElementById('te-invite-' + uid).value = invite
+}
+ 
+async function saveClanLogo(uid, id) {
+  if (!currentUser || currentUser.discord_id !== OWNER_ID) return
+  const fileInput = document.getElementById('logo-file-' + uid)
+  const status = document.getElementById('logo-status-' + uid)
+  const file = fileInput.files[0]
+  if (!file) { status.textContent = 'No file selected'; return }
+  status.textContent = 'Uploading...'
+  try {
+    const base64data = await new Promise((res, rej) => {
+      const r = new FileReader()
+      r.onload = () => res(r.result.split(',')[1])
+      r.onerror = () => rej(new Error('Read failed'))
+      r.readAsDataURL(file)
+    })
+    const resp = await fetch('/api/cms-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, table: 'faction_stats', field: 'image_proof',
+        value: base64data, is_upload: true, filename: file.name, filetype: file.type,
+        discord_id: currentUser.discord_id })
+    })
+    const data = await resp.json()
+    if (data.success) {
+      status.textContent = 'Saved!'
+      if (data.url) {
+        const img = document.getElementById('logo-img-' + uid)
+        if (img) { img.src = data.url; img.className = 'clan-logo' }
+      }
+      setTimeout(() => { document.getElementById('logo-editor-' + uid).style.display = 'none' }, 1000)
+    } else { status.textContent = 'Error: ' + (data.error || 'failed') }
+  } catch(e) { status.textContent = 'Network error' }
+}
+ 
+async function saveClanDetails(uid, id) {
+  if (!currentUser || currentUser.discord_id !== OWNER_ID) return
+  const status = document.getElementById('te-status-' + uid)
+  const owners = document.getElementById('te-owners-' + uid).value
+  const members = document.getElementById('te-members-' + uid).value
+  const invite = document.getElementById('te-invite-' + uid).value
+  status.textContent = 'Saving...'
+  try {
+    const resp = await fetch('/api/cms-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, table: 'faction_stats', field: 'multi',
+        values: { owners, total_members: members ? parseInt(members) : null, invite_link: invite },
+        discord_id: currentUser.discord_id })
+    })
+    const data = await resp.json()
+    if (data.success) {
+      status.textContent = 'Saved!'
+      setTimeout(() => { document.getElementById('text-editor-' + uid).style.display = 'none'; loadClans() }, 800)
+    } else { status.textContent = 'Error: ' + (data.error || 'failed') }
+  } catch(e) { status.textContent = 'Network error' }
 }
 
 
