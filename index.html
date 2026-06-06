@@ -44,6 +44,104 @@
 
 html { scroll-behavior: smooth; }
 
+/* ── CMS EDIT MODE ── */
+.edit-btn {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border: 1px solid var(--rule2);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.edit-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+body.is-owner .edit-btn { display: inline-block; }
+
+.cms-editor {
+  display: none;
+  margin-top: 1rem;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.cms-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  background: var(--ink);
+  flex-wrap: wrap;
+}
+.cms-tool {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--paper);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 2px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.cms-tool:hover { background: rgba(255,255,255,0.25); }
+.cms-textarea {
+  width: 100%;
+  min-height: 200px;
+  background: var(--paper2);
+  border: none;
+  border-top: 1px solid var(--rule2);
+  padding: 0.75rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text);
+  outline: none;
+  resize: vertical;
+  line-height: 1.7;
+}
+.cms-actions {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--paper3);
+  border-top: 1px solid var(--rule2);
+}
+.cms-save {
+  font-family: var(--font-type);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 2px;
+  padding: 5px 16px;
+  cursor: pointer;
+}
+.cms-cancel {
+  font-family: var(--font-type);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--rule2);
+  border-radius: 2px;
+  padding: 5px 16px;
+  cursor: pointer;
+}
+.cms-status {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  padding: 5px 0;
+  margin-left: auto;
+}
+
+
 .submit-page { max-width: 680px; }
 .form-card { background: var(--paper2); border: 1px solid var(--rule2); border-radius: 2px; padding: 1.75rem; margin-bottom: 1.5rem; }
 .form-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
@@ -779,18 +877,9 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <div id="page-clans" style="display:none">
     <div class="page-header fade-in">
       <div class="page-title">Clan Records</div>
-      <div class="page-sub">Historical timeline of events, milestones, and power shifts</div>
+      <div class="page-sub">Every approved clan registered in Crab City</div>
     </div>
-    <div class="filter-bar fade-in">
-      <input class="search-input" id="clan-search" type="text" placeholder="Search clan name..." oninput="searchClans(this.value)">
-      <div class="filter-sep"></div>
-      <button class="filter-btn active" onclick="filterClanType('all',this)">All</button>
-      <button class="filter-btn" onclick="filterClanType('founded',this)">Founded</button>
-      <button class="filter-btn" onclick="filterClanType('war',this)">War</button>
-      <button class="filter-btn" onclick="filterClanType('leadership_change',this)">Leadership</button>
-      <button class="filter-btn" onclick="filterClanType('disbanded',this)">Disbanded</button>
-    </div>
-    <div id="clan-list" class="fade-in"><div class="state-msg">Search a clan name to pull records.</div></div>
+    <div id="clan-list" class="fade-in"><div class="state-msg">Loading...</div></div>
   </div>
 
   <!-- ══ WARS ══ -->
@@ -860,7 +949,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
   <!-- ══ PATCHES ══ -->
   <div id="page-patches" style="display:none">
     <div class="page-header fade-in">
-      <div class="page-title">Dev Dispatches</div>
+      <div class="page-title">Developers Notes: Dispatch</div>
       <div class="page-sub">Every patch note archived — from the first hotfix to the latest drop</div>
     </div>
     <div id="patch-list" class="fade-in"></div>
@@ -952,8 +1041,12 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 1.25rem 4rem; position: rel
             <input class="form-input" id="f-invite" type="text" placeholder="https://discord.gg/..." required>
           </div>
           <div class="form-group">
-            <label class="form-label">Image proof URL <span>*</span></label>
-            <input class="form-input" id="f-image" type="text" placeholder="Screenshot of faction page — upload to Discord and copy link" required>
+            <label class="form-label">Clan flag / banner image <span>*</span></label>
+            <div class="file-drop" id="faction-drop" onclick="document.getElementById('f-image-file').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleFactionDrop(event)">
+              <div class="file-drop-text">Click to upload or drag and drop your clan flag or banner</div>
+              <div class="file-drop-name" id="faction-file-name">No file selected</div>
+            </div>
+            <input type="file" id="f-image-file" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none" onchange="handleFactionFileSelect(this)">
           </div>
           <button class="form-submit" onclick="submitFaction()">Submit for review</button>
           <div class="form-msg" id="f-msg"></div>
@@ -1060,7 +1153,7 @@ async function loadHomePreviews() {
   // Latest patch
   const patchEl = document.getElementById('home-patch')
   try {
-    const { data: patches } = await sb.from('dev_patches').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(1)
+    const { data: patches } = await sb.from('dev_patches').select('*').eq('status','approved').order('patch_date',{ascending:false,nullsFirst:false}).limit(1)
     if (patches?.length) {
       const p = patches[0]
       patchEl.innerHTML = `
@@ -1078,7 +1171,7 @@ async function loadHomePreviews() {
   // Latest news
   const newsEl = document.getElementById('home-news')
   try {
-    const { data: news } = await sb.from('news').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(1)
+    const { data: news } = await sb.from('news').select('*').eq('status','approved').order('patch_date',{ascending:false,nullsFirst:false}).limit(1)
     if (news?.length) {
       const n = news[0]
       newsEl.innerHTML = `
@@ -1181,20 +1274,52 @@ function searchClans(val) {
   searchTimer = setTimeout(() => fetchClans(val), 280)
 }
 
-async function fetchClans(name) {
+async function loadClans() {
   const el = document.getElementById('clan-list')
-  el.innerHTML = '<div class="state-msg">Searching files...</div>'
-  let q = sb.from('clan_history').select('*').eq('status','approved').ilike('clan_name',`%${name}%`)
-  if (currentClanType !== 'all') q = q.eq('event_type', currentClanType)
-  let data
-  try { ({ data } = await q.order('event_date',{ascending:true})) }
-  catch(e) { el.innerHTML = '<div class="state-msg">Search failed — check back later.</div>'; return }
-  if (!data?.length) { el.innerHTML = `<div class="state-msg">No record found.</div>`; return }
+  el.innerHTML = '<div class="state-msg">Loading...</div>'
+
+  let factions = [], history = []
+  try {
+    const [fRes, hRes] = await Promise.all([
+      sb.from('faction_stats').select('*').eq('status','approved').order('faction_name',{ascending:true}),
+      sb.from('clan_history').select('*').eq('status','approved').order('event_date',{ascending:true})
+    ])
+    factions = fRes.data || []
+    history = hRes.data || []
+  } catch(e) {
+    el.innerHTML = '<div class="state-msg">Could not load clan records. Check back later.</div>'
+    return
+  }
+
+  if (!factions.length && !history.length) {
+    el.innerHTML = '<div class="state-msg">No clans registered yet.</div>'
+    return
+  }
+
+  // Group history by clan name
   const grouped = {}
-  data.forEach(e => { if (!grouped[e.clan_name]) grouped[e.clan_name] = []; grouped[e.clan_name].push(e) })
-  el.innerHTML = Object.entries(grouped).map(([clan, events]) => `
-    <div class="card-item">
-      <div class="card-title" style="margin-bottom:1rem; font-size:1.1rem">${esc(clan)}</div>
+  history.forEach(e => { if (!grouped[e.clan_name]) grouped[e.clan_name] = []; grouped[e.clan_name].push(e) })
+
+  // All unique clan names — factions first, then any with only history
+  const allNames = [...new Set([...factions.map(f => f.faction_name), ...Object.keys(grouped)])]
+
+  el.innerHTML = '<div class="card-list">' + allNames.map(clan => {
+    const reg = factions.find(f => f.faction_name === clan)
+    const events = grouped[clan] || []
+
+    const regHtml = reg ? `
+      <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:0.85rem;">
+        ${reg.team ? factionPill(reg.team) : ''}
+        ${reg.total_members != null ? `<span class="chip">Members <b>${reg.total_members}</b></span>` : ''}
+        ${reg.date_started ? `<span class="chip">Est. <b>${fmtDate(reg.date_started)}</b></span>` : ''}
+        ${reg.owners ? `<span class="chip">Owner(s) <b>${esc(reg.owners)}</b></span>` : ''}
+      </div>
+      ${reg.image_proof ? `<img src="${esc(reg.image_proof)}" alt="${esc(clan)} banner" style="max-width:100%;max-height:180px;object-fit:cover;border-radius:2px;margin-bottom:0.85rem;display:block;border:1px solid var(--rule2);">` : ''}
+      ${reg.invite_link ? `<div style="margin-bottom:0.85rem;font-size:0.82rem;color:var(--muted);font-style:italic;">Discord: <a href="${esc(reg.invite_link)}" target="_blank" style="color:var(--text);text-decoration:underline;">${esc(reg.invite_link)}</a></div>` : ''}
+    ` : ''
+
+    const timelineHtml = events.length ? `
+      <div style="font-family:var(--font-mono);font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:0.6rem;margin-top:${reg ? '0.75rem' : '0'};">History</div>
       <div class="timeline">${events.map(e => `
         <div class="tl-item">
           <div class="tl-dot"></div>
@@ -1203,9 +1328,17 @@ async function fetchClans(name) {
           <div class="tl-desc">${esc(e.description)}</div>
         </div>
       `).join('')}</div>
-    </div>
-  `).join('')
+    ` : ''
+
+    return `
+      <div class="card-item">
+        <div class="card-title" style="margin-bottom:0.75rem;font-size:1.1rem">${esc(clan)}</div>
+        ${regHtml}${timelineHtml}
+      </div>
+    `
+  }).join('') + '</div>'
 }
+
 
 // ── WARS ──
 async function loadWars() {
@@ -1393,17 +1526,36 @@ function renderNews(data) {
 async function loadPatches() {
   const el = document.getElementById('patch-list')
   let data
-  try { ({ data } = await sb.from('dev_patches').select('*').eq('status','approved').order('created_at',{ascending:false}).limit(30)) }
+  try { ({ data } = await sb.from('dev_patches').select('*').eq('status','approved').order('patch_date',{ascending:false,nullsFirst:false}).limit(30)) }
   catch(e) { el.innerHTML = '<div class="state-msg">Could not load dispatches. Check back later.</div>'; return }
   if (!data?.length) { el.innerHTML = '<div class="state-msg">No dispatches filed yet.</div>'; return }
   el.innerHTML = `<div class="card-list">${data.map(p => `
-    <div class="card-item">
+    <div class="card-item" id="patch-${p.id}">
       <div style="display:flex; align-items:center; flex-wrap:wrap; gap:0.5rem;">
         <span class="patch-ver">v${esc(p.version)}</span>
         <span class="card-title" style="margin:0">${esc(p.title)}</span>
         <span class="card-meta" style="margin-left:auto">${fmtDate(p.patch_date)}</span>
+        <button class="edit-btn" onclick="openEditor('${p.id}', 'dev_patches', 'content', this)">Edit</button>
       </div>
-      <div class="patch-body">${esc(p.content).replace(/\n/g, '<br>')}</div>
+      <div class="patch-body" id="patch-body-${p.id}">${esc(p.content).replace(/\n/g, '<br>')}</div>
+      <div class="cms-editor" id="editor-${p.id}">
+        <div class="cms-toolbar">
+          <span style="font-family:var(--font-mono);font-size:0.6rem;color:rgba(255,255,255,0.5);padding:3px 4px;align-self:center;">Format:</span>
+          <button class="cms-tool" onclick="insertText('${p.id}', '• ', '')">• Bullet</button>
+          <button class="cms-tool" onclick="insertText('${p.id}', '', '\n')">↵ New line</button>
+          <button class="cms-tool" onclick="insertText('${p.id}', '\n', '')">↵ Blank line</button>
+          <button class="cms-tool" onclick="insertText('${p.id}', '[ADDED] ', '')">Added</button>
+          <button class="cms-tool" onclick="insertText('${p.id}', '[FIXED] ', '')">Fixed</button>
+          <button class="cms-tool" onclick="insertText('${p.id}', '[CHANGED] ', '')">Changed</button>
+          <button class="cms-tool" onclick="insertText('${p.id}', '[REMOVED] ', '')">Removed</button>
+        </div>
+        <textarea class="cms-textarea" id="textarea-${p.id}">${esc(p.content)}</textarea>
+        <div class="cms-actions">
+          <button class="cms-save" onclick="saveEdit('${p.id}', 'dev_patches', 'content')">Save changes</button>
+          <button class="cms-cancel" onclick="closeEditor('${p.id}')">Cancel</button>
+          <span class="cms-status" id="cms-status-${p.id}"></span>
+        </div>
+      </div>
     </div>
   `).join('')}</div>`
 }
@@ -1448,6 +1600,74 @@ function factionColor(f) {
 loadHomeCounts()
 loadHomePreviews()
 
+
+// ── CMS EDITOR ──
+function openEditor(id, table, field, btn) {
+  const editor = document.getElementById('editor-' + id)
+  const textarea = document.getElementById('textarea-' + id)
+  editor.style.display = 'block'
+  textarea.focus()
+  btn.textContent = 'Editing...'
+  btn.disabled = true
+}
+
+function closeEditor(id) {
+  document.getElementById('editor-' + id).style.display = 'none'
+  const btn = document.querySelector(`[onclick*="openEditor('${id}'"]`)
+  if (btn) { btn.textContent = 'Edit'; btn.disabled = false }
+  document.getElementById('cms-status-' + id).textContent = ''
+}
+
+function insertText(id, before, after) {
+  const ta = document.getElementById('textarea-' + id)
+  const start = ta.selectionStart
+  const end = ta.selectionEnd
+  const selected = ta.value.substring(start, end)
+  const newText = before + selected + after
+  ta.value = ta.value.substring(0, start) + newText + ta.value.substring(end)
+  ta.focus()
+  ta.setSelectionRange(start + before.length, start + before.length + selected.length)
+}
+
+async function saveEdit(id, table, field) {
+  if (!currentUser || currentUser.discord_id !== OWNER_ID) return
+  const textarea = document.getElementById('textarea-' + id)
+  const status = document.getElementById('cms-status-' + id)
+  const newValue = textarea.value
+
+  status.textContent = 'Saving...'
+  status.style.color = 'var(--muted)'
+
+  try {
+    const res = await fetch('/api/cms-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id,
+        table,
+        field,
+        value: newValue,
+        discord_id: currentUser.discord_id
+      })
+    })
+    const data = await res.json()
+    if (data.success) {
+      status.textContent = 'Saved!'
+      status.style.color = 'green'
+      // Update displayed content
+      const bodyEl = document.getElementById(table === 'news' ? 'news-body-' + id : 'patch-body-' + id)
+      if (bodyEl) bodyEl.innerHTML = newValue.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')
+      setTimeout(() => closeEditor(id), 1000)
+    } else {
+      status.textContent = 'Error: ' + (data.error || 'failed')
+      status.style.color = 'red'
+    }
+  } catch(e) {
+    status.textContent = 'Network error'
+    status.style.color = 'red'
+  }
+}
+
 // ── AUTH STATE ──
 let currentUser = null
 
@@ -1468,8 +1688,13 @@ function initAuth() {
   }
 }
 
+const OWNER_ID = '910599867175419934'
+
 function setUser(user) {
   currentUser = user
+  if (user.discord_id === OWNER_ID) {
+    document.body.classList.add('is-owner')
+  }
   document.getElementById('login-btn').style.display = 'none'
   const ui = document.getElementById('user-info')
   ui.style.display = 'flex'
@@ -1486,6 +1711,7 @@ function setUser(user) {
 function logout() {
   localStorage.removeItem('ccc_user')
   currentUser = null
+  document.body.classList.remove('is-owner')
   document.getElementById('login-btn').style.display = 'inline-flex'
   document.getElementById('user-info').style.display = 'none'
   document.getElementById('submit-gate').style.display = 'block'
@@ -1506,6 +1732,23 @@ let selectedFile = null
 function handleFileSelect(input) {
   selectedFile = input.files[0]
   document.getElementById('file-name').textContent = selectedFile ? selectedFile.name : 'No file selected'
+}
+
+let selectedFactionFile = null
+
+function handleFactionFileSelect(input) {
+  selectedFactionFile = input.files[0]
+  document.getElementById('faction-file-name').textContent = selectedFactionFile ? selectedFactionFile.name : 'No file selected'
+}
+
+function handleFactionDrop(e) {
+  e.preventDefault()
+  document.getElementById('faction-drop').classList.remove('drag')
+  const file = e.dataTransfer.files[0]
+  if (file) {
+    selectedFactionFile = file
+    document.getElementById('faction-file-name').textContent = file.name
+  }
 }
 
 function handleDrop(e) {
@@ -1579,32 +1822,31 @@ async function submitFaction() {
   const date = document.getElementById('f-date').value
   const owners = document.getElementById('f-owners').value.trim()
   const invite = document.getElementById('f-invite').value.trim()
-  const image = document.getElementById('f-image').value.trim()
 
-  if (!name || !team || !members || !date || !owners || !invite || !image) {
+  if (!name || !team || !members || !date || !owners || !invite) {
     return showMsg('f-msg', 'error', 'Please fill in all required fields.')
+  }
+  if (!selectedFactionFile) {
+    return showMsg('f-msg', 'error', 'Please upload your clan flag or banner image.')
   }
 
   const btn = document.querySelector('#form-faction .form-submit')
-  btn.disabled = true; btn.textContent = 'Submitting...'
+  btn.disabled = true; btn.textContent = 'Uploading...'
 
   try {
-    const res = await fetch('/api/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'faction_stats',
-        discord_id: currentUser.discord_id,
-        discord_username: currentUser.username,
-        faction_name: name,
-        team,
-        total_members: parseInt(members),
-        date_started: date,
-        owners,
-        invite_link: invite,
-        image_proof: image,
-      })
-    })
+    const formData = new FormData()
+    formData.append('type', 'faction_stats')
+    formData.append('discord_id', currentUser.discord_id)
+    formData.append('discord_username', currentUser.username)
+    formData.append('faction_name', name)
+    formData.append('team', team)
+    formData.append('total_members', members)
+    formData.append('date_started', date)
+    formData.append('owners', owners)
+    formData.append('invite_link', invite)
+    formData.append('image', selectedFactionFile)
+
+    const res = await fetch('/api/submit', { method: 'POST', body: formData })
     const data = await res.json()
     if (data.success) showMsg('f-msg', 'success', `Faction submitted. Entry ID: ${data.id}. A mod will review it shortly.`)
     else showMsg('f-msg', 'error', data.error || 'Submission failed.')
