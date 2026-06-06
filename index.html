@@ -1396,7 +1396,7 @@ async function loadClans() {
       ${previewHtml}
       <div class="clan-history-toggle" onclick="toggleHistory('${uid}', this)">
         <span class="toggle-arrow">▶</span>
-        ${events.length} event${events.length !== 1 ? 's' : ''} in history
+       ${events.length} event${events.length !== 1 ? "s" : ""} in history
       </div>
       <div class="clan-history-full" id="hist-${uid}">
         <div class="timeline">${events.map(e => `
@@ -1412,7 +1412,7 @@ async function loadClans() {
     const editBtns = reg ? `
       <div class="cms-img-row">
         <button class="edit-btn" style="margin-left:0" onclick="openClanLogoEditor('${uid}')">Change Logo</button>
-        <button class="edit-btn" style="margin-left:0" onclick="openClanTextEditor('${uid}','${reg.id}','${esc(reg.owners||'')}','${reg.total_members||''}','${esc(reg.invite_link||'')}')">Edit Details</button>
+        <button class="edit-btn" style="margin-left:0" onclick="openClanTextEditor('${uid}','${reg.id}','${esc(reg.owners||"")}','${reg.total_members||""}','${esc(reg.invite_link||"")}')">Edit Details</button>
       </div>
       <div id="logo-editor-${uid}" style="display:none;margin-top:0.75rem;padding:0.75rem;background:var(--paper3);border:1px solid var(--rule2);border-radius:2px;">
         <div style="font-family:var(--font-mono);font-size:0.62rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Upload new logo</div>
