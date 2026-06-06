@@ -1,11 +1,11 @@
 const OWNER_DISCORD_ID = '910599867175419934'
 
-// Allowed tables and fields to prevent arbitrary writes
 const ALLOWED = {
   dev_patches: ['content', 'title', 'version'],
   news: ['content', 'title'],
   clan_history: ['description', 'title'],
   clan_wars: ['description'],
+  faction_stats: ['image_proof', 'owners', 'total_members', 'invite_link', 'multi'],
 }
 
 export default async function handler(req, res) {
@@ -14,42 +14,53 @@ export default async function handler(req, res) {
   let body
   try { body = req.body } catch(e) { return res.status(400).json({ error: 'Invalid body' }) }
 
-  const { id, table, field, value, discord_id } = body
+  const { id, table, field, value, values, discord_id, is_upload, filename, filetype } = body
 
-  // Owner check
-  if (discord_id !== OWNER_DISCORD_ID) {
-    return res.status(403).json({ error: 'Not authorised' })
-  }
+  if (discord_id !== OWNER_DISCORD_ID) return res.status(403).json({ error: 'Not authorised' })
+  if (!ALLOWED[table] || !ALLOWED[table].includes(field)) return res.status(400).json({ error: 'Invalid table or field' })
+  if (!id) return res.status(400).json({ error: 'Missing id' })
 
-  // Validate table and field
-  if (!ALLOWED[table] || !ALLOWED[table].includes(field)) {
-    return res.status(400).json({ error: 'Invalid table or field' })
-  }
-
-  if (!id || !value) {
-    return res.status(400).json({ error: 'Missing id or value' })
-  }
-
-  // Update in Supabase
-  const updateRes = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`,
-    {
+  // ── MULTI-FIELD UPDATE ──
+  if (field === 'multi') {
+    if (!values || typeof values !== 'object') return res.status(400).json({ error: 'Missing values' })
+    const updateRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: process.env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-        Prefer: 'return=minimal',
-      },
-      body: JSON.stringify({ [field]: value }),
-    }
-  )
-
-  if (!updateRes.ok) {
-    const err = await updateRes.text()
-    console.error('CMS update error:', err)
-    return res.status(500).json({ error: 'Database update failed' })
+      headers: { 'Content-Type': 'application/json', apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, Prefer: 'return=minimal' },
+      body: JSON.stringify(values),
+    })
+    if (!updateRes.ok) return res.status(500).json({ error: 'Database update failed' })
+    return res.status(200).json({ success: true })
   }
 
+  // ── IMAGE UPLOAD ──
+  if (is_upload && field === 'image_proof') {
+    if (!value || !filename || !filetype) return res.status(400).json({ error: 'Missing file data' })
+    const fileBuffer = Buffer.from(value, 'base64')
+    const ext = filename.split('.').pop()
+    const storageName = `factions/${id}_${Date.now()}.${ext}`
+    const uploadRes = await fetch(`${process.env.SUPABASE_URL}/storage/v1/object/submissions/${storageName}`, {
+      method: 'POST',
+      headers: { 'Content-Type': filetype, apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}` },
+      body: fileBuffer,
+    })
+    if (!uploadRes.ok) { console.error('Upload error:', await uploadRes.text()); return res.status(500).json({ error: 'Image upload failed' }) }
+    const publicUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/submissions/${storageName}`
+    const updateRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/faction_stats?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, Prefer: 'return=minimal' },
+      body: JSON.stringify({ image_proof: publicUrl }),
+    })
+    if (!updateRes.ok) return res.status(500).json({ error: 'Database update failed' })
+    return res.status(200).json({ success: true, url: publicUrl })
+  }
+
+  // ── STANDARD TEXT UPDATE ──
+  if (!value) return res.status(400).json({ error: 'Missing value' })
+  const updateRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, Prefer: 'return=minimal' },
+    body: JSON.stringify({ [field]: value }),
+  })
+  if (!updateRes.ok) { console.error('CMS update error:', await updateRes.text()); return res.status(500).json({ error: 'Database update failed' }) }
   return res.status(200).json({ success: true })
 }
