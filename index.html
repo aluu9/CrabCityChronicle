@@ -1406,6 +1406,7 @@ async function loadClans() {
     const editBtns = reg ? `
       <div class="cms-img-row">
         <button class="edit-btn" style="margin-left:0" onclick="openClanLogoEditor('${uid}')">Change Logo</button>
+        <button class="edit-btn" style="margin-left:0;color:#8b1a1a;border-color:#8b1a1a;" onclick="deleteEntry('${reg.id}', 'faction_stats')">Delete Clan</button>
         <button class="edit-btn" style="margin-left:0" onclick="openClanTextEditor('${uid}','${reg.id}','${esc(reg.owners||"")}','${reg.total_members||""}','${esc(reg.invite_link||"")}')">Edit Details</button>
       </div>
       <div id="logo-editor-${uid}" style="display:none;margin-top:0.75rem;padding:0.75rem;background:var(--paper3);border:1px solid var(--rule2);border-radius:2px;">
@@ -1708,7 +1709,10 @@ function renderNews(data) {
       <div class="news-cat">${n.category}</div>
       <div class="news-headline">${esc(n.title)}</div>
       ${n.content ? `<div class="news-body">${esc(n.content)}</div>` : ''}
-      <div class="card-meta" style="margin-top:0.75rem">${fmtDate(n.created_at)}</div>
+     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.75rem;">
+  <div class="card-meta">${fmtDate(n.created_at)}</div>
+  <button class="edit-btn" onclick="deleteEntry('${n.id}', 'news')" style="color:#8b1a1a;border-color:#8b1a1a;">Delete</button>
+</div>
     </div>
   `).join('')}</div>`
 }
@@ -1727,6 +1731,7 @@ async function loadPatches() {
         <span class="card-title" style="margin:0">${esc(p.title)}</span>
         <span class="card-meta" style="margin-left:auto">${fmtDate(p.patch_date)}</span>
         <button class="edit-btn" onclick="openEditor('${p.id}', 'dev_patches', 'content', this)">Edit</button>
+        <button class="edit-btn" onclick="deleteEntry('${p.id}', 'dev_patches')" style="color:#8b1a1a;border-color:#8b1a1a;">Delete</button>
       </div>
       <div class="patch-body" id="patch-body-${p.id}">${esc(p.content).replace(/\n/g, '<br>')}</div>
       <div class="cms-editor" id="editor-${p.id}">
