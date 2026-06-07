@@ -20,6 +20,15 @@ export default async function handler(req, res) {
   if (discord_id !== OWNER_DISCORD_ID) return res.status(403).json({ error: 'Not authorised' })
   if (!ALLOWED[table] || !ALLOWED[table].includes(field)) return res.status(400).json({ error: 'Invalid table or field' })
   if (!id) return res.status(400).json({ error: 'Missing id' })
+  // ── DELETE ──
+if (field === 'delete') {
+  const deleteRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: 'DELETE',
+    headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}` },
+  })
+  if (!deleteRes.ok) return res.status(500).json({ error: 'Delete failed' })
+  return res.status(200).json({ success: true })
+}
 
   // ── MULTI-FIELD UPDATE ──
   if (field === 'multi') {
