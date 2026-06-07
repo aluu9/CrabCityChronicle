@@ -1,11 +1,12 @@
 const OWNER_DISCORD_ID = '910599867175419934'
 
 const ALLOWED = {
-  dev_patches: ['content', 'title', 'version'],
-  news: ['content', 'title'],
-  clan_history: ['description', 'title'],
-  clan_wars: ['description'],
-  faction_stats: ['image_proof', 'owners', 'total_members', 'invite_link', 'multi'],
+  dev_patches: ['content', 'title', 'version', 'delete'],
+  news: ['content', 'title', 'delete'],
+  clan_history: ['description', 'title', 'delete'],
+  clan_wars: ['description', 'delete'],
+  faction_stats: ['image_proof', 'owners', 'total_members', 'invite_link', 'multi', 'delete'],
+}
 }
 
 export default async function handler(req, res) {
