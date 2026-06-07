@@ -1705,38 +1705,6 @@ async function loadClanLb() {
   `).join('')
 }
 
-  const merged = verified.map(f => {
-    const s = standings.find(s => s.clan_name === f.faction_name) || {}
-    return {
-      clan_name: f.faction_name,
-      faction: f.team,
-      member_count: f.total_members,
-      members_online: f.members_online,
-      war_score: s.war_score || 0,
-      total_wins: s.total_wins || 0,
-      total_kills: s.total_kills || 0,
-    }
-  }).sort((a,b) => (b.war_score||0) - (a.war_score||0))
-
-  if (!merged.length) { el.innerHTML = '<div class="state-msg">No clan standings on record.</div>'; return }
-
-  const rankCls = i => i===0?'gold':i===1?'silver':i===2?'bronze':''
-  const rankLbl = i => i===0?'I':i===1?'II':i===2?'III':`${i+1}.`
-  el.innerHTML = merged.map((c,i) => `
-    <div class="clan-row">
-      <div class="clan-rank ${rankCls(i)}">${rankLbl(i)}</div>
-      <div class="clan-name">${esc(c.clan_name)} ${c.faction?`<span style="font-size:0.78rem; font-weight:300; color:var(--muted2); font-style:italic">(${esc(c.faction)})</span>`:''}</div>
-      <div class="clan-stats">
-        <span>Score <b>${c.war_score}</b></span>
-        <span>Wins <b>${c.total_wins}</b></span>
-        <span>Kills <b>${c.total_kills}</b></span>
-        <span>Members <b>${c.member_count||'—'}</b></span>
-        ${c.members_online != null ? `<span>Online <b style="color:#2d7a3a">${c.members_online}</b></span>` : ''}
-      </div>
-    </div>
-  `).join('')
-}
-
 // ── NEWS ──
 async function loadNews() {
   const el = document.getElementById('news-list')
