@@ -1373,6 +1373,8 @@ async function loadClans() {
       <div class="clan-meta-row">
         ${reg.team ? factionPill(reg.team) : ''}
         ${reg.total_members != null ? `<span class="chip">Members <b>${reg.total_members}</b></span>` : ''}
+        ${reg.members_online != null ? `<span class="chip" style="color:#2d7a3a">Online <b>${reg.members_online}</b></span>` : ''}
+${reg.last_synced ? `<span class="chip">Synced <b>${fmtDate(reg.last_synced)}</b></span>` : ''}
         ${reg.date_started ? `<span class="chip">Est. <b>${fmtDate(reg.date_started)}</b></span>` : ''}
         ${reg.owners ? `<span class="chip">Owners <b>${esc(reg.owners)}</b></span>` : ''}
         <span class="chip" style="color:#2d7a3a;border-color:#2d7a3a;">✓ Verified</span>
