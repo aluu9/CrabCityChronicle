@@ -1790,6 +1790,7 @@ sb.channel('archive-live')
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'clan_leaderboard'}, () => { if(currentPage==='leaderboard') loadClanLb() })
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'news'}, () => { if(currentPage==='news') loadNews() })
   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'dev_patches'}, () => { if(currentPage==='patches') loadPatches() })
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'faction_stats'}, () => { if(currentPage==='clans') loadClans(); if(currentPage==='leaderboard') loadClanLb() })
   .subscribe()
 
 // ── HELPERS ──
