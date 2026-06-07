@@ -1,3 +1,4 @@
+export const config = { api: { bodyParser: true } }
 const OWNER_DISCORD_ID = '910599867175419934'
 
 const ALLOWED = {
