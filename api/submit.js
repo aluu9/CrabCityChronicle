@@ -117,35 +117,63 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, id: saved.id })
     }
 
-    // ── FACTION STATS ──
-    if (type === 'faction_stats') {
-      const entry = {
-        submitted_by,
-        faction_name: parts.faction_name,
-        total_members: parts.total_members ? parseInt(parts.total_members) : null,
-        wins: parts.wins ? parseInt(parts.wins) : null,
-        losses: parts.losses ? parseInt(parts.losses) : null,
-        territory_count: parts.territory_count ? parseInt(parts.territory_count) : null,
-        description: parts.description || null,
-        status: 'pending',
-      }
-
-      const insertRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/faction_stats`, {
+// ── FACTION STATS ──
+if (type === 'faction_stats') {
+  // Upload image to Supabase Storage
+  let imageUrl = null
+  const imageFile = parts.image
+  if (imageFile && imageFile.data) {
+    const allowedImages = ['image/png','image/jpeg','image/webp','image/gif']
+    if (!allowedImages.includes(imageFile.contentType)) {
+      return res.status(400).json({ error: 'Invalid image type. Use PNG, JPG, WebP or GIF.' })
+    }
+    const imageName = `factions/${discord_id}_${Date.now()}_${imageFile.filename.replace(/[^a-zA-Z0-9._-]/g,'_')}`
+    const uploadRes = await fetch(
+      `${process.env.SUPABASE_URL}/storage/v1/object/submissions/${imageName}`,
+      {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': imageFile.contentType,
           apikey: process.env.SUPABASE_SERVICE_KEY,
           Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-          Prefer: 'return=representation',
         },
-        body: JSON.stringify(entry),
-      })
-
-      if (!insertRes.ok) return res.status(500).json({ error: 'Failed to save faction stat' })
-      const [saved] = await insertRes.json()
-      await notifyDiscord('faction stat', discord_username, saved.id, entry)
-      return res.status(200).json({ success: true, id: saved.id })
+        body: imageFile.data,
+      }
+    )
+    if (uploadRes.ok) {
+      imageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/submissions/${imageName}`
     }
+  }
+
+  const entry = {
+    submitted_by,
+    faction_name: parts.faction_name,
+    team: parts.team || null,
+    total_members: parts.total_members ? parseInt(parts.total_members) : null,
+    date_started: parts.date_started || null,
+    owners: parts.owners || null,
+    invite_link: parts.invite_link || null,
+    roblox_group: parts.roblox_group || null,
+    image_proof: imageUrl,
+    status: 'pending',
+  }
+
+  const insertRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/faction_stats`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: process.env.SUPABASE_SERVICE_KEY,
+      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify(entry),
+  })
+
+  if (!insertRes.ok) return res.status(500).json({ error: 'Failed to save faction stat' })
+  const [saved] = await insertRes.json()
+  await notifyDiscord('faction', discord_username, saved.id, entry)
+  return res.status(200).json({ success: true, id: saved.id })
+}
 
     // ── VIDEO UPLOAD ──
     if (type === 'video') {
