@@ -1308,7 +1308,7 @@ async function loadClans() {
   let factions = [], history = [], wars = []
   try {
     const [fRes, hRes, wRes] = await Promise.all([
-      sb.from('faction_stats').select('*').eq('status','approved').order('faction_name',{ascending:true}),
+      sb.from('faction_stats').select('*').eq('status','approved').eq('bot_verified',true).order('faction_name',{ascending:true}),
       sb.from('clan_history').select('*').eq('status','approved').order('event_date',{ascending:false}),
       sb.from('clan_wars').select('clan_a,clan_b,winner').eq('status','approved')
     ])
@@ -1375,6 +1375,7 @@ async function loadClans() {
         ${reg.total_members != null ? `<span class="chip">Members <b>${reg.total_members}</b></span>` : ''}
         ${reg.date_started ? `<span class="chip">Est. <b>${fmtDate(reg.date_started)}</b></span>` : ''}
         ${reg.owners ? `<span class="chip">Owners <b>${esc(reg.owners)}</b></span>` : ''}
+        <span class="chip" style="color:#2d7a3a;border-color:#2d7a3a;">✓ Verified</span>
       </div>
       ${reg.invite_link ? `<a href="${esc(reg.invite_link)}" target="_blank" class="clan-invite-link">↗ Discord Server</a>` : ''}
     ` : ''
