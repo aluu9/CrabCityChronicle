@@ -1,4 +1,5 @@
 export const config = { api: { bodyParser: true } }
+
 const OWNER_DISCORD_ID = '910599867175419934'
 
 const ALLOWED = {
@@ -8,28 +9,29 @@ const ALLOWED = {
   clan_wars: ['description', 'delete'],
   faction_stats: ['image_proof', 'owners', 'total_members', 'invite_link', 'multi', 'delete'],
 }
-}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  let body
-  try { body = req.body } catch(e) { return res.status(400).json({ error: 'Invalid body' }) }
+  const body = req.body
+  if (!body) return res.status(400).json({ error: 'Empty body' })
 
   const { id, table, field, value, values, discord_id, is_upload, filename, filetype } = body
 
   if (discord_id !== OWNER_DISCORD_ID) return res.status(403).json({ error: 'Not authorised' })
-  if (!ALLOWED[table] || !ALLOWED[table].includes(field)) return res.status(400).json({ error: 'Invalid table or field' })
+  if (!table || !ALLOWED[table]) return res.status(400).json({ error: 'Invalid table' })
+  if (!field || !ALLOWED[table].includes(field)) return res.status(400).json({ error: 'Invalid field' })
   if (!id) return res.status(400).json({ error: 'Missing id' })
+
   // ── DELETE ──
-if (field === 'delete') {
-  const deleteRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method: 'DELETE',
-    headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}` },
-  })
-  if (!deleteRes.ok) return res.status(500).json({ error: 'Delete failed' })
-  return res.status(200).json({ success: true })
-}
+  if (field === 'delete') {
+    const deleteRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}` },
+    })
+    if (!deleteRes.ok) { console.error('Delete error:', await deleteRes.text()); return res.status(500).json({ error: 'Delete failed' }) }
+    return res.status(200).json({ success: true })
+  }
 
   // ── MULTI-FIELD UPDATE ──
   if (field === 'multi') {
