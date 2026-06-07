@@ -2064,6 +2064,7 @@ async function submitFaction() {
     formData.append('date_started', date)
     formData.append('owners', owners)
     formData.append('invite_link', invite)
+    formData.append('roblox_group', document.getElementById('f-roblox').value || '')
     formData.append('image', selectedFactionFile)
 
     const res = await fetch('/api/submit', { method: 'POST', body: formData })
