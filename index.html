@@ -1672,6 +1672,20 @@ async function loadClanLb() {
     verified = vRes.data || []
     standings = sRes.data || []
   } catch(e) { el.innerHTML = '<div class="state-msg">Could not load clan standings.</div>'; return }
+  merged.map((c,i) => `
+    <div class="clan-row">
+      <div class="clan-rank ${rankCls(i)}">${rankLbl(i)}</div>
+      <div class="clan-name">${esc(c.clan_name)} ${c.faction?`<span style="font-size:0.78rem; font-weight:300; color:var(--muted2); font-style:italic">(${esc(c.faction)})</span>`:''}</div>
+      <div class="clan-stats">
+        <span>Score <b>${c.war_score}</b></span>
+        <span>Wins <b>${c.total_wins}</b></span>
+        <span>Kills <b>${c.total_kills}</b></span>
+        <span>Members <b>${c.member_count||'—'}</b></span>
+        ${c.members_online != null ? `<span>Online <b style="color:#2d7a3a">${c.members_online}</b></span>` : ''}
+      </div>
+    </div>
+  `).join('')
+}
 
   const merged = verified.map(f => {
     const s = standings.find(s => s.clan_name === f.faction_name) || {}
