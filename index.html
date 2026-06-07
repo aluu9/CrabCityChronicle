@@ -1819,7 +1819,24 @@ function insertText(id, before, after) {
   ta.focus()
   ta.setSelectionRange(start + before.length, start + before.length + selected.length)
 }
-
+async function deleteEntry(id, table) {
+  if (!currentUser || currentUser.discord_id !== OWNER_ID) return
+  if (!confirm('Delete this entry permanently?')) return
+  try {
+    const res = await fetch('/api/cms-edit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, table, field: 'delete', discord_id: currentUser.discord_id })
+    })
+    const data = await res.json()
+    if (data.success) {
+      document.getElementById('patch-' + id)?.remove()
+      document.getElementById('news-' + id)?.remove()
+      loadHomePreviews()
+      loadClans()
+    } else alert('Delete failed: ' + (data.error || 'unknown'))
+  } catch(e) { alert('Network error') }
+}
 async function saveEdit(id, table, field) {
   if (!currentUser || currentUser.discord_id !== OWNER_ID) return
   const textarea = document.getElementById('textarea-' + id)
